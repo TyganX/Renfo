@@ -12,6 +12,11 @@
 		2F0DA9692BE12EC800979111 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F0DA9682BE12EC800979111 /* Item.swift */; };
 		2F0DA96B2BE12EC900979111 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2F0DA96A2BE12EC900979111 /* Assets.xcassets */; };
 		2F0DA96E2BE12EC900979111 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2F0DA96D2BE12EC900979111 /* Preview Assets.xcassets */; };
+		2F0DA97A2BE1301000979111 /* Functions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F0DA9792BE1301000979111 /* Functions.swift */; };
+		2F0DA97C2BE1305100979111 /* Calendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F0DA97B2BE1305100979111 /* Calendar.swift */; };
+		2F0DA97E2BE1305A00979111 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F0DA97D2BE1305A00979111 /* Settings.swift */; };
+		2F0DA9802BE1394700979111 /* Home.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F0DA97F2BE1394700979111 /* Home.swift */; };
+		2F0DA9822BE14A0B00979111 /* FestivalInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F0DA9812BE14A0B00979111 /* FestivalInfo.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +26,11 @@
 		2F0DA9682BE12EC800979111 /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
 		2F0DA96A2BE12EC900979111 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2F0DA96D2BE12EC900979111 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		2F0DA9792BE1301000979111 /* Functions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Functions.swift; sourceTree = "<group>"; };
+		2F0DA97B2BE1305100979111 /* Calendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Calendar.swift; sourceTree = "<group>"; };
+		2F0DA97D2BE1305A00979111 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
+		2F0DA97F2BE1394700979111 /* Home.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Home.swift; sourceTree = "<group>"; };
+		2F0DA9812BE14A0B00979111 /* FestivalInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FestivalInfo.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,6 +63,9 @@
 		2F0DA9632BE12EC800979111 /* Renfo */ = {
 			isa = PBXGroup;
 			children = (
+				2F0DA9742BE12F0300979111 /* Views */,
+				2F0DA9812BE14A0B00979111 /* FestivalInfo.swift */,
+				2F0DA9792BE1301000979111 /* Functions.swift */,
 				2F0DA9642BE12EC800979111 /* RenfoApp.swift */,
 				2F0DA9662BE12EC800979111 /* ContentView.swift */,
 				2F0DA9682BE12EC800979111 /* Item.swift */,
@@ -68,6 +81,16 @@
 				2F0DA96D2BE12EC900979111 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		2F0DA9742BE12F0300979111 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				2F0DA97F2BE1394700979111 /* Home.swift */,
+				2F0DA97B2BE1305100979111 /* Calendar.swift */,
+				2F0DA97D2BE1305A00979111 /* Settings.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -86,6 +109,8 @@
 			dependencies = (
 			);
 			name = Renfo;
+			packageProductDependencies = (
+			);
 			productName = Renfo;
 			productReference = 2F0DA9612BE12EC800979111 /* Renfo.app */;
 			productType = "com.apple.product-type.application";
@@ -114,6 +139,8 @@
 				Base,
 			);
 			mainGroup = 2F0DA9582BE12EC800979111;
+			packageReferences = (
+			);
 			productRefGroup = 2F0DA9622BE12EC800979111 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -140,8 +167,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2F0DA9822BE14A0B00979111 /* FestivalInfo.swift in Sources */,
 				2F0DA9672BE12EC800979111 /* ContentView.swift in Sources */,
+				2F0DA9802BE1394700979111 /* Home.swift in Sources */,
+				2F0DA97C2BE1305100979111 /* Calendar.swift in Sources */,
 				2F0DA9692BE12EC800979111 /* Item.swift in Sources */,
+				2F0DA97E2BE1305A00979111 /* Settings.swift in Sources */,
+				2F0DA97A2BE1301000979111 /* Functions.swift in Sources */,
 				2F0DA9652BE12EC800979111 /* RenfoApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -273,12 +305,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Renfo/Preview Content\"";
 				DEVELOPMENT_TEAM = XKQ424HQ33;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Renfo;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.reference";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -302,12 +337,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Renfo/Preview Content\"";
 				DEVELOPMENT_TEAM = XKQ424HQ33;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Renfo;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.reference";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
