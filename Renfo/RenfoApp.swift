@@ -10,8 +10,10 @@ import SwiftData
 
 @main
 struct RenfoApp: App {
-    @AppStorage("appTheme") var appTheme: AppTheme = .system // Add the app theme storage
+    @AppStorage("appTheme") var appTheme: AppTheme = .system
     @AppStorage("selectedIcon") var selectedIcon: AppIcon = .default
+    @AppStorage("appColor") var appColor: AppColor = .default
+
     
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
@@ -58,18 +60,21 @@ enum AppTheme: String, CaseIterable, Identifiable {
 
 enum AppIcon: String, CaseIterable {
     case `default` = "AppIcon"
+    case chalice = "AppIcon-Chalice"
     case gold = "AppIcon-Gold"
-    case red = "AppIcon-Red"
+    case pink = "AppIcon-Pink"
     // Add more cases for each alternate icon
 
     var displayName: String {
         switch self {
         case .default:
             return "Default"
+        case .chalice:
+            return "Chalice"
         case .gold:
             return "Gold"
-        case .red:
-            return "Red"
+        case .pink:
+            return "Pink"
         // Add more display names for each case
         }
     }
@@ -80,4 +85,39 @@ enum AppIcon: String, CaseIterable {
     }
 }
 
+// Define your AppColor enum with all the accent colors you want to offer
+enum AppColor: String, CaseIterable, Identifiable, Hashable {
+    case `default` = "Default"
+    case royalOrange = "Royal Orange"
+    case red = "Red"
+    case orange = "Orange"
+    case yellow = "Yellow"
+    case green = "Green"
+    case blue = "Blue"
+    case purple = "Purple"
+    
+    var id: String { self.rawValue }
+    
+    // Add a computed property to get the actual Color value
+    var color: Color {
+        switch self {
+        case .default:
+            return Color.primary
+        case .royalOrange:
+            return Color("AccentColor-RoyalOrange")
+        case .red:
+            return .red
+        case .orange:
+            return .orange
+        case .yellow:
+            return .yellow
+        case .green:
+            return .green
+        case .blue:
+            return .blue
+        case .purple:
+            return .purple
+        }
+    }
+}
 

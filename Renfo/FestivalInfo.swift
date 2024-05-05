@@ -14,7 +14,11 @@ struct FestivalInfo {
     var campgroundMapImageName: String
     var lostAndFoundURL: String
     var activeMonths: [String]
+    var street: String
+    var city: String
     var state: String
+    var stateShort: String
+    var zip: String
 }
 
 // Create instances of FestivalInfo for each festival
@@ -31,7 +35,11 @@ let texasRenaissanceFestival = FestivalInfo(
     campgroundMapImageName: "TRFCampgroundMap",
     lostAndFoundURL: "https://www.texrenfest.com/lost-and-found",
     activeMonths: ["Oct", "Nov", "Dec"],
-    state: "Texas"
+    street: "21778 FM 1774",
+    city: "Todd Mission",
+    state: "Texas",
+    stateShort: "TX",
+    zip: "77363"
 )
 
 let sherwoodForestFaire = FestivalInfo(
@@ -47,7 +55,11 @@ let sherwoodForestFaire = FestivalInfo(
     campgroundMapImageName: "SFFCampgroundMap",
     lostAndFoundURL: "https://docs.google.com/forms/d/e/1FAIpQLSfjtw__EmEXitzdBxUeoHEzXZOWcDJ4iBAzotlq8podyhe9AQ/viewform?fbclid=IwAR2UOFTry3PYHK-uevjDgaijKchnpfctJKWWGZC3rTnWcwVHKSxotq0W-dw_aem_ASwbpiQpCOwKBpjyMCjJR6_YL6afxNXs_uMhMXn_jwOjofyWRy44pXSwA93blZyT7qk",
     activeMonths: ["Mar", "Apr"],
-    state: "Texas"
+    street: "1883 Old Hwy 20",
+    city: "McDade",
+    state: "Texas",
+    stateShort: "TX",
+    zip: "78650"
 )
 
 let scarboroughRenaissanceFestival = FestivalInfo(
@@ -63,7 +75,11 @@ let scarboroughRenaissanceFestival = FestivalInfo(
     campgroundMapImageName: "SRFCampgroundMap",
     lostAndFoundURL: "https://www.srfestival.com/",
     activeMonths: ["Apr", "May"],
-    state: "Texas"
+    street: "2511 FM 66",
+    city: "Waxahachie",
+    state: "Texas",
+    stateShort: "TX",
+    zip: "75167"
 )
 
 let marylandRenaissanceFestival = FestivalInfo(
@@ -79,7 +95,11 @@ let marylandRenaissanceFestival = FestivalInfo(
     campgroundMapImageName: "MDRFCampgroundMap",
     lostAndFoundURL: "https://www.rennfest.com/",
     activeMonths: ["Aug", "Sep", "Oct"],
-    state: "Maryland"
+    street: "1821 Crownsville Rd",
+    city: "Annapolis",
+    state: "Maryland",
+    stateShort: "MD",
+    zip: "21401"
 )
 
 let renaissancePleasureFaire = FestivalInfo(
@@ -95,7 +115,11 @@ let renaissancePleasureFaire = FestivalInfo(
     campgroundMapImageName: "RPFCampgroundMap",
     lostAndFoundURL: "https://www.renfair.com/socal/",
     activeMonths: ["Apr", "May"],
-    state: "California"
+    street: "15501 E. Arrow Highway",
+    city: "Irwindale",
+    state: "California",
+    stateShort: "CA",
+    zip: "91722"
 )
 
 let louisianaRenaissanceFestival = FestivalInfo(
@@ -111,6 +135,31 @@ let louisianaRenaissanceFestival = FestivalInfo(
     campgroundMapImageName: "LRFCampgroundMap",
     lostAndFoundURL: "https://www.larf2023.org/",
     activeMonths: ["Nov", "Dec"],
-    state: "Louisiana"
+    street: "46468 River Rd",
+    city: "Hammond",
+    state: "Louisiana",
+    stateShort: "LA",
+    zip: "70401"
 )
+
+let northernCaliforniaRenaissanceFaire = FestivalInfo(
+    name: "Northern California Renaissance Faire",
+    description: "A grand celebration of medieval culture.",
+    logoImageName: "NCRFLogo",
+    phoneNumber: "111-111-1111",
+    email: "entertainment@norcalrenfaire.com",
+    mapLink: "https://maps.apple.com/?q=Northern+California+Renaissance+Faire",
+    websiteURL: "https://norcalrenfaire.com/",
+    ticketsURL: "https://norcalrenfaire.com/tickets/",
+    festivalMapImageName: "NCRFFestivalMap",
+    campgroundMapImageName: "NCRFCampgroundMap",
+    lostAndFoundURL: "https://www.larf2023.org/",
+    activeMonths: ["Sep", "Oct"],
+    street: "10031 Pacheco Pass Hwy 152",
+    city: "Hollister",
+    state: "California",
+    stateShort: "CA",
+    zip: "95023"
+)
+
 // Add more festivals as needed

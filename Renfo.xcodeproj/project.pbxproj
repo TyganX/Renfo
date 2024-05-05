@@ -17,6 +17,7 @@
 		2F0DA97E2BE1305A00979111 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F0DA97D2BE1305A00979111 /* Settings.swift */; };
 		2F0DA9802BE1394700979111 /* Home.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F0DA97F2BE1394700979111 /* Home.swift */; };
 		2F0DA9822BE14A0B00979111 /* FestivalInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F0DA9812BE14A0B00979111 /* FestivalInfo.swift */; };
+		2FDA01482BE5598A005495A5 /* Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FDA01472BE5598A005495A5 /* Test.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +32,7 @@
 		2F0DA97D2BE1305A00979111 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		2F0DA97F2BE1394700979111 /* Home.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Home.swift; sourceTree = "<group>"; };
 		2F0DA9812BE14A0B00979111 /* FestivalInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FestivalInfo.swift; sourceTree = "<group>"; };
+		2FDA01472BE5598A005495A5 /* Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Test.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +68,7 @@
 				2F0DA9742BE12F0300979111 /* Views */,
 				2F0DA9812BE14A0B00979111 /* FestivalInfo.swift */,
 				2F0DA9792BE1301000979111 /* Functions.swift */,
+				2FDA01472BE5598A005495A5 /* Test.swift */,
 				2F0DA9642BE12EC800979111 /* RenfoApp.swift */,
 				2F0DA9662BE12EC800979111 /* ContentView.swift */,
 				2F0DA9682BE12EC800979111 /* Item.swift */,
@@ -169,6 +172,7 @@
 			files = (
 				2F0DA9822BE14A0B00979111 /* FestivalInfo.swift in Sources */,
 				2F0DA9672BE12EC800979111 /* ContentView.swift in Sources */,
+				2FDA01482BE5598A005495A5 /* Test.swift in Sources */,
 				2F0DA9802BE1394700979111 /* Home.swift in Sources */,
 				2F0DA97C2BE1305100979111 /* Calendar.swift in Sources */,
 				2F0DA9692BE12EC800979111 /* Item.swift in Sources */,

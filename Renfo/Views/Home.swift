@@ -1,81 +1,44 @@
 import SwiftUI
 
 struct HomeView: View {
-    // State variable to track sorting criterion
-    @State private var sortingCriterion: SortingCriterion = .name
-    // State dictionary to track collapsed sections
-    @State private var collapsedSections: [String: Bool] = [:]
+    @State private var visibleStates: [String: Bool]
+    @State private var editMode: EditMode = .inactive
+    @State private var tempVisibleStates: [String: Bool]
 
-    // Enum for sorting criteria
-    enum SortingCriterion: String, CaseIterable {
-        case name = "Ascending"
-        case nameDescending = "Descending"
-        case comingSoon = "Coming Soon"
-        case closest = "Closest"
-    }
-
-    // Array of festivals
     let festivals: [FestivalInfo] = [
         louisianaRenaissanceFestival,
         marylandRenaissanceFestival,
+        northernCaliforniaRenaissanceFaire,
         renaissancePleasureFaire,
         scarboroughRenaissanceFestival,
         sherwoodForestFaire,
         texasRenaissanceFestival,
         // Add more festivals as needed
     ]
-    
-    // Group festivals by state without sorting them
+
     var groupedFestivals: [String: [FestivalInfo]] {
         Dictionary(grouping: festivals, by: { $0.state })
     }
 
-    // Sorted states based on the current sorting criterion
-    var sortedStates: [String] {
-        switch sortingCriterion {
-        case .name:
-            return groupedFestivals.keys.sorted()
-        case .nameDescending:
-            return groupedFestivals.keys.sorted().reversed()
-        case .comingSoon:
-            // Sort logic for states with the soonest upcoming festivals
-            return groupedFestivals.keys.sorted() // Replace with actual sorting logic
-        case .closest:
-            // Sort logic for states closest to the user's location
-            return groupedFestivals.keys.sorted() // Replace with actual sorting logic
-        }
+    init() {
+        let initialStates = Dictionary(grouping: festivals, by: { $0.state }).keys
+        _visibleStates = State(initialValue: initialStates.reduce(into: [:]) { $0[$1] = true })
+        _tempVisibleStates = State(initialValue: initialStates.reduce(into: [:]) { $0[$1] = true })
     }
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             List {
-                // Create a section for each sorted state
-                ForEach(sortedStates, id: \.self) { state in
-                    Section(header:
-                        HStack {
-                            Text(state)
-                            Spacer()
-                        Button(action: {
-                            withAnimation(.easeInOut) {
-                                self.collapsedSections[state] = !(self.collapsedSections[state] ?? false)
-                            }
-                        }) {
-                            Image(systemName: "chevron.right")
-                                .rotationEffect(.degrees(self.collapsedSections[state] ?? false ? 0 : 90))
-                        }
-                    }
-                    ) {
-                        // Only show the content if the section is not collapsed
-                        if !(self.collapsedSections[state] ?? false) {
-                            ForEach(groupedFestivals[state] ?? [], id: \.name) { festival in
-                                NavigationLink(destination: FestivalView(festival: festival)) {
-                                    HStack {
-                                        Image(festival.logoImageName)
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 50, height: 50)
-                                        Text(festival.name)
-                                    }
+                ForEach(groupedFestivals.keys.sorted().filter { editMode == .active || visibleStates[$0] ?? true }, id: \.self) { state in
+                    Section(header: EditableSectionHeader(state: state, tempVisibleStates: $tempVisibleStates, editMode: $editMode)) {
+                        ForEach(groupedFestivals[state] ?? [], id: \.name) { festival in
+                            NavigationLink(destination: FestivalView(festival: festival)) {
+                                HStack {
+                                    Image(festival.logoImageName)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 40, height: 40)
+                                    Text(festival.name)
                                 }
                             }
                         }
@@ -83,134 +46,154 @@ struct HomeView: View {
                 }
             }
             .navigationTitle("Renfo")
+            .environment(\.editMode, $editMode)
             .toolbar {
-                // Sort button with dropdown menu and title
-                Menu {
-                    Text("Sort")
-                    ForEach(SortingCriterion.allCases, id: \.self) { criterion in
-                        Button(action: {
-                            self.sortingCriterion = criterion
-                        }) {
-                            HStack {
-                                // Checkmark to the left of the selected item
-                                if sortingCriterion == criterion {
-                                    Image(systemName: "checkmark")
-                                }
-                                Text(criterion.rawValue)
-                            }
-                        }
-                    }
-                } label: {
-                    Image(systemName: "arrow.up.arrow.down.circle")
-                }
+                EditButton(editMode: $editMode, visibleStates: $visibleStates, tempVisibleStates: $tempVisibleStates)
             }
         }
     }
 }
 
+struct EditableSectionHeader: View {
+    let state: String
+    @Binding var tempVisibleStates: [String: Bool]
+    @Binding var editMode: EditMode
+
+    var body: some View {
+        HStack {
+            if editMode == .active {
+                Button(action: {
+                    tempVisibleStates[state]?.toggle()
+                }) {
+                    Image(systemName: tempVisibleStates[state] ?? true ? "checkmark.circle.fill" : "circle")
+                        .foregroundColor(tempVisibleStates[state] ?? true ? nil : .gray)
+                }
+            }
+            Text(state)
+            Spacer()
+        }
+    }
+}
+
+struct EditButton: View {
+    @Binding var editMode: EditMode
+    @Binding var visibleStates: [String: Bool]
+    @Binding var tempVisibleStates: [String: Bool]
+
+    var body: some View {
+        Button(action: {
+            withAnimation {
+                if editMode == .active {
+                    // Save the temporary states to the actual visible states when exiting edit mode
+                    visibleStates = tempVisibleStates
+                } else {
+                    // Copy the visible states to the temporary states when entering edit mode
+                    tempVisibleStates = visibleStates
+                }
+                editMode = editMode == .active ? .inactive : .active
+            }
+        }) {
+//            Text(editMode == .active ? "Done" : "Edit")
+            Image(systemName: editMode == .active ? "checkmark.circle" : "ellipsis.circle")
+        }
+    }
+}
+
 struct FestivalView: View {
+    @AppStorage("appColor") var appColor: AppColor = .default // Retrieve the selected app color
+    
     var festival: FestivalInfo
     
     var body: some View {
-        VStack(alignment: .center, spacing: 20) {
-            Image(festival.logoImageName)
-                .resizable()
-                .scaledToFit()
-                .frame(height: 200)
-                .padding(.top)
-            
-                HStack {
-                    Text("Active:")
-                        .font(.headline)
-                    ForEach(festival.activeMonths, id: \.self) { month in
-                        Text(month)
-                            .padding(5)
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(5)
+        NavigationStack {
+            Form {
+                Section {
+                    VStack(alignment: .center, spacing: 20) {
+                        Image(festival.logoImageName)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 200)
+                        
+                        Text(festival.name)
+                            .font(.title3)
+                            .fontWeight(.bold)
+                        
+                        HStack {
+                            Button(action: {
+                                // Action to call the festival's phone number
+                                let telephone = "tel://"
+                                let formattedNumber = festival.phoneNumber.replacingOccurrences(of: "-", with: "")
+                                if let url = URL(string: "\(telephone)\(formattedNumber)") {
+                                    UIApplication.shared.open(url)
+                                }
+                            }) {
+                                VStack {
+                                    Image(systemName: "phone.fill")
+                                    Text("call")
+                                        .font(.caption)
+                                }
+                                .frame(width: 54, height: 44)
+                            }
+                            .buttonStyle(.bordered)
+                            
+                            Spacer() // Add a spacer between buttons
+
+                            Button(action: {
+                                // Action to send an email to the festival's email address
+                                let email = "mailto:\(festival.email)"
+                                if let url = URL(string: email) {
+                                    UIApplication.shared.open(url)
+                                }
+                            }) {
+                                VStack {
+                                    Image(systemName: "envelope.fill")
+                                    Text("mail")
+                                        .font(.caption)
+                                }
+                                .frame(width: 54, height: 44)
+                            }
+                            .buttonStyle(.bordered)
+                            
+                            Spacer() // Add a spacer between buttons
+
+                            Button(action: {
+                                // Action to open the festival's map link
+                                if let url = URL(string: festival.mapLink) {
+                                    UIApplication.shared.open(url)
+                                }
+                            }) {
+                                VStack {
+                                    Image(systemName: "location.fill")
+                                    Text("maps")
+                                        .font(.caption)
+                                }
+                                .frame(width: 54, height: 44)
+                            }
+                            .buttonStyle(.bordered)
+                            
+                            Spacer() // Add a spacer between buttons
+                            
+                            Button(action: {
+                                // Action to open the festival's website
+                                if let url = URL(string: festival.websiteURL) {
+                                    UIApplication.shared.open(url)
+                                }
+                            }) {
+                                VStack {
+                                    Image(systemName: "globe")
+                                    Text("website")
+                                        .font(.caption)
+                                }
+                                .frame(width: 54, height: 44)
+                            }
+                            .buttonStyle(.bordered)
+                        }
                     }
+                    .frame(maxWidth: .infinity)
+                    .listRowInsets(EdgeInsets())
+                    .listRowBackground(Color.clear)
                 }
-            
-            HStack {
-                Spacer() // Add a spacer on the left side
-
-                Button(action: {
-                    // Action to call the festival's phone number
-                    let telephone = "tel://"
-                    let formattedNumber = festival.phoneNumber.replacingOccurrences(of: "-", with: "")
-                    if let url = URL(string: "\(telephone)\(formattedNumber)") {
-                        UIApplication.shared.open(url)
-                    }
-                }) {
-                    Image(systemName: "phone.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 40, height: 24)
-                        .padding()
-                        .background(Color.gray.opacity(0.2))
-                        .cornerRadius(8)
-                }
-                .frame(maxWidth: .infinity) // Make the button expand
-
-                Spacer() // Add a spacer between buttons
-
-                Button(action: {
-                    // Action to send an email to the festival's email address
-                    let email = "mailto:\(festival.email)"
-                    if let url = URL(string: email) {
-                        UIApplication.shared.open(url)
-                    }
-                }) {
-                    Image(systemName: "envelope.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 40, height: 24)
-                        .padding()
-                        .background(Color.gray.opacity(0.2))
-                        .cornerRadius(8)
-                }
-                .frame(maxWidth: .infinity) // Make the button expand
-
-                Spacer() // Add a spacer between buttons
-
-                Button(action: {
-                    // Action to open the festival's map link
-                    if let url = URL(string: festival.mapLink) {
-                        UIApplication.shared.open(url)
-                    }
-                }) {
-                    Image(systemName: "location.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 40, height: 24)
-                        .padding()
-                        .background(Color.gray.opacity(0.2))
-                        .cornerRadius(8)
-                }
-                .frame(maxWidth: .infinity) // Make the button expand
                 
-                Spacer() // Add a spacer between buttons
-                
-                Button(action: {
-                    // Action to open the festival's website
-                    if let url = URL(string: festival.websiteURL) {
-                        UIApplication.shared.open(url)
-                    }
-                }) {
-                    Image(systemName: "globe")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 40, height: 24)
-                        .padding()
-                        .background(Color.gray.opacity(0.2))
-                        .cornerRadius(8)
-                }
-                .frame(maxWidth: .infinity) // Make the button expand
-                
-                Spacer() // Add a spacer on the right side
-            }
-            
-            List {
                 Section(header: Text("Resources")) {
                     NavigationLink(destination: ImageView(imageName: festival.festivalMapImageName)) {
                         Label("Festival Map", systemImage: "map.fill")
@@ -226,11 +209,30 @@ struct FestivalView: View {
                 }
             }
         }
-        .navigationBarTitle(Text(festival.name), displayMode: .inline)
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarItems(trailing: HStack {
+            ForEach(festival.activeMonths, id: \.self) { month in
+                Button(action: {
+                    // This space intentionally left blank to disable the button action.
+                }) {
+                    VStack {
+                        Text(month)
+                            .font(.caption)
+//                            .fontWeight(.bold)
+//                            .foregroundColor(appColor.color)
+                    }
+                }
+                .buttonStyle(.bordered)
+//                .disabled(true) // This disables the button
+//                .foregroundColor(appColor.color)
+            }
+        })
     }
 }
 
-// Preview provider for Home view
-#Preview {
-    HomeView()
+// Preview provider
+struct HomeView_Previews: PreviewProvider {
+    static var previews: some View {
+        HomeView()
+    }
 }
