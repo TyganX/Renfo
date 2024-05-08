@@ -1,13 +1,59 @@
 import SwiftUI
+import FirebaseAuth
 
 struct SettingsView: View {
     @AppStorage("appTheme") var appTheme: AppTheme = .system
     @AppStorage("selectedIcon") var selectedIcon: AppIcon = .default
     @AppStorage("appColor") var appColor: AppColor = .default
+    @EnvironmentObject var sessionStore: SessionStore
+    @State private var isShowingLogin = false
+    @State private var isShowingProfile = false
+    
     
     var body: some View {
         NavigationStack {
             Form {
+                // Profile Header Section
+                Section {
+                    if sessionStore.isUserSignedIn {
+                        NavigationLink(destination: ProfileView()) {
+                            HStack(spacing: 15) {
+                                Circle()
+                                    .fill(Color.gray)
+                                    .frame(width: 60, height: 60)
+                                    .overlay(Text(sessionStore.userInitials)
+                                        .font(.title2)
+                                        .foregroundColor(.white))
+                                VStack(alignment: .leading) {
+                                    if let userName = sessionStore.userName { // Display the user's name if available
+                                        Text(userName) // Now a computed property in SessionStore
+                                            .font(.headline)
+                                    }
+                                    Text(sessionStore.userEmail) // Ensure this is a computed property in SessionStore
+                                        .font(.subheadline)
+                                        .foregroundColor(.gray)
+                                }
+                            }
+                        }
+                    } else {
+                        NavigationLink(destination: SignInView()) {
+                            HStack(spacing: 15) {
+                                Image(systemName: "person.crop.circle.fill") // Directly use the system image
+                                    .resizable() // Make the image resizable
+                                    .scaledToFit() // Scale the image to fit
+                                    .frame(width: 60, height: 60) // Set the frame for the image
+                                    .foregroundColor(.gray) // Set the color for the image
+                                VStack(alignment: .leading) {
+                                    Text("Guest")
+                                        .font(.headline)
+                                    Text("Sign in")
+                                        .foregroundColor(.blue)
+                                }
+                            }
+                        }
+                    }
+                }
+
                 Section(header: Text("Appearance")) {
                     NavigationLink(value: AppTheme.system) {
                         Label("App Theme", systemImage: "paintbrush.pointed.fill")
@@ -17,18 +63,19 @@ struct SettingsView: View {
                         Label("App Color", systemImage: "paintpalette.fill")
                     }
                     
-                    // Add this NavigationLink for App Icon selection
                     NavigationLink(value: AppIconSelectionView(selectedIcon: $selectedIcon)) {
                         Label("App Icon", systemImage: "app.badge.fill")
                     }
                 }
                 
-                Section(header: Text("BEAN BANDITS")) {
-                    URLButtonInApp(label: "Website", systemImage: "globe", urlString: "https://www.beanbandits.net/")
+                Section(header: Text("Other")) {
+                    NavigationLink(destination: BeanBandits()) {
+                        Label("About", systemImage: "info.circle.fill")
+                    }
                     
-                    URLButton(label: "Discord", systemImage: "person.bubble.fill", urlString: "discord://discord.gg/bE5tkVdAt9")
-                    
-                    URLButton(label: "Telegram", systemImage: "paperplane.fill", urlString: "https://t.me/BeanBandits")
+                    NavigationLink(destination: BeanBandits()) {
+                        Label("Bean Bandits", systemImage: "surfboard.fill")
+                    }
                 }
             }
             .navigationTitle("Settings")
@@ -49,7 +96,7 @@ struct SettingsView: View {
         }
     }
 }
-    
+
 struct ThemeSelectionView: View {
     @Binding var selectedTheme: AppTheme // This binds to the appTheme in SettingsView
     
@@ -185,5 +232,6 @@ struct AppIconSelectionView: View, Hashable {
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
         SettingsView()
+            .environmentObject(SessionStore())
     }
 }

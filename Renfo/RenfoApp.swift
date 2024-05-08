@@ -6,37 +6,38 @@
 //
 
 import SwiftUI
-import SwiftData
+import Firebase
+import FirebaseAuth
 
+// MARK: - Main Application Entry Point
 @main
 struct RenfoApp: App {
-    @AppStorage("appTheme") var appTheme: AppTheme = .system
-    @AppStorage("selectedIcon") var selectedIcon: AppIcon = .default
-    @AppStorage("appColor") var appColor: AppColor = .default
-
+    // MARK: - App Storage Properties
+    @AppStorage("appTheme") private var appTheme: AppTheme = .system
+    @AppStorage("selectedIcon") private var selectedIcon: AppIcon = .default
+    @AppStorage("appColor") private var appColor: AppColor = .default
     
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+    // MARK: - State Object
+    // SessionStore to manage user session state
+    @StateObject private var sessionStore = SessionStore()
 
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
-
+    // MARK: - Initializer
+    init() {
+        // Firebase configuration
+        FirebaseApp.configure()
+    }
+    
+    // MARK: - Scene Builder
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .preferredColorScheme(determineColorScheme()) // Apply the preferred color scheme
+                .environmentObject(sessionStore) // Provide sessionStore to the views
+                .preferredColorScheme(determineColorScheme()) // Apply color scheme based on user preference
         }
-        .modelContainer(sharedModelContainer)
     }
 
-    // Function to determine the color scheme based on the app theme setting
+    // MARK: - Helper Methods
+    // Determine the color scheme based on the app theme setting
     private func determineColorScheme() -> ColorScheme? {
         switch appTheme {
         case .light:
@@ -49,20 +50,17 @@ struct RenfoApp: App {
     }
 }
 
-// Make sure to define the AppTheme enum if it's not already defined
+// MARK: - Enumerations
+// Define the AppTheme enum for theme settings
 enum AppTheme: String, CaseIterable, Identifiable {
-    case system = "System"
-    case light = "Light"
-    case dark = "Dark"
+    case system, light, dark
     
     var id: String { self.rawValue }
 }
 
+// Define the AppIcon enum for app icon customization
 enum AppIcon: String, CaseIterable {
-    case `default` = "AppIcon"
-    case chalice = "AppIcon-Chalice"
-    case gold = "AppIcon-Gold"
-    case pink = "AppIcon-Pink"
+    case `default`, chalice, gold, pink
     // Add more cases for each alternate icon
 
     var displayName: String {
@@ -80,25 +78,16 @@ enum AppIcon: String, CaseIterable {
     }
 
     var iconName: String? {
-        // For the default case, return nil to use the original icon
         self == .default ? nil : self.rawValue
     }
 }
 
-// Define your AppColor enum with all the accent colors you want to offer
+// Define the AppColor enum for accent color customization
 enum AppColor: String, CaseIterable, Identifiable, Hashable {
-    case `default` = "Default"
-    case royalOrange = "Royal Orange"
-    case red = "Red"
-    case orange = "Orange"
-    case yellow = "Yellow"
-    case green = "Green"
-    case blue = "Blue"
-    case purple = "Purple"
+    case `default`, royalOrange, red, orange, yellow, green, blue, purple
     
     var id: String { self.rawValue }
     
-    // Add a computed property to get the actual Color value
     var color: Color {
         switch self {
         case .default:
@@ -121,3 +110,58 @@ enum AppColor: String, CaseIterable, Identifiable, Hashable {
     }
 }
 
+// MARK: - Session Management
+// SessionStore class to manage user authentication state
+class SessionStore: ObservableObject {
+    @Published var isUserSignedIn: Bool = false
+    @Published var userName: String?
+    var handle: AuthStateDidChangeListenerHandle?
+
+    init() {
+        handle = Auth.auth().addStateDidChangeListener { [weak self] (auth, user) in
+            self?.isUserSignedIn = user != nil
+            self?.userName = user?.displayName
+        }
+    }
+
+    // Computed property to get user initials from email
+    var userInitials: String {
+        guard let email = Auth.auth().currentUser?.email, let firstLetter = email.first else { return "N/A" }
+        return String(firstLetter).uppercased()
+    }
+
+    // Computed property to get the user's email
+    var userEmail: String {
+        Auth.auth().currentUser?.email ?? "Not available"
+    }
+    
+    // Create a new user account with email, password, and name
+    func createAccount(email: String, password: String, name: String, completion: @escaping (Bool, Error?) -> Void) {
+        Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
+            if let user = authResult?.user {
+                let changeRequest = user.createProfileChangeRequest()
+                changeRequest.displayName = name
+                changeRequest.commitChanges { error in
+                    if error == nil {
+                        self.userName = name
+                        completion(true, nil)
+                    } else {
+                        completion(false, error)
+                    }
+                }
+            } else {
+                completion(false, error)
+            }
+        }
+    }
+    
+    // Sign out the current user
+    func signOut() {
+        do {
+            try Auth.auth().signOut()
+            isUserSignedIn = false
+        } catch let signOutError as NSError {
+            print("Error signing out: %@", signOutError)
+        }
+    }
+}
