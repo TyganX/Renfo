@@ -35,16 +35,16 @@ struct HomeView: View {
     }
 
     init() {
-        // Load the visibleStates from UserDefaults or default to all true
-        if let savedStates = UserDefaults.standard.data(forKey: "visibleStates"),
-           let decodedStates = try? JSONDecoder().decode([String: Bool].self, from: savedStates) {
-            _visibleStates = State(initialValue: decodedStates)
-        } else {
-            let initialStates = Dictionary(grouping: festivals, by: { $0.state }).keys
-            _visibleStates = State(initialValue: initialStates.reduce(into: [:]) { $0[$1] = true })
+            // Load the visibleStates from UserDefaults or default to all true
+            if let savedStates = UserDefaults.standard.data(forKey: "visibleStates"),
+               let decodedStates = try? JSONDecoder().decode([String: Bool].self, from: savedStates) {
+                _visibleStates = State(initialValue: decodedStates)
+            } else {
+                let initialStates = Dictionary(grouping: festivals, by: { $0.state }).keys
+                _visibleStates = State(initialValue: initialStates.reduce(into: [:]) { $0[$1] = true })
+            }
+            _tempVisibleStates = State(initialValue: _visibleStates.wrappedValue)
         }
-        _tempVisibleStates = State(initialValue: _visibleStates.wrappedValue)
-    }
 
     // MARK: - View Body
     var body: some View {
@@ -68,7 +68,7 @@ struct HomeView: View {
                     }
                 }
             }
-            .searchable(text: $searchText, prompt: "Search Festivals") // Search bar added here
+            .searchable(text: $searchText, prompt: "Search") // Search bar added here
             .navigationTitle("Renfo")
             .environment(\.editMode, $editMode)
             .toolbar {
@@ -95,18 +95,26 @@ struct EditableSectionHeader: View {
     @Binding var editMode: EditMode
 
     var body: some View {
-        HStack {
+        Button(action: {
+            // Only toggle the state if in edit mode
             if editMode == .active {
-                Button(action: {
-                    tempVisibleStates[state]?.toggle()
-                }) {
+                tempVisibleStates[state]?.toggle()
+            }
+        }) {
+            HStack {
+                if editMode == .active {
                     Image(systemName: tempVisibleStates[state] ?? true ? "checkmark.circle.fill" : "circle")
                         .foregroundColor(tempVisibleStates[state] ?? true ? nil : .gray)
                 }
+                Text(state)
+                    .font(.subheadline)
+                    .fontWeight(.bold)
+//                    .fontDesign(.rounded)
+                    .foregroundColor(.primary)
+                Spacer()
             }
-            Text(state)
-            Spacer()
         }
+        .disabled(editMode == .inactive) // Disable the button when not in edit mode
     }
 }
 

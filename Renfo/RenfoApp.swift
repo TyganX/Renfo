@@ -60,7 +60,10 @@ enum AppTheme: String, CaseIterable, Identifiable {
 
 // Define the AppIcon enum for app icon customization
 enum AppIcon: String, CaseIterable {
-    case `default`, chalice, gold, pink
+    case `default` = "AppIcon"
+    case chalice = "AppIcon-Chalice"
+    case gold = "AppIcon-Gold"
+    case pink = "AppIcon-Pink"
     // Add more cases for each alternate icon
 
     var displayName: String {
@@ -84,7 +87,14 @@ enum AppIcon: String, CaseIterable {
 
 // Define the AppColor enum for accent color customization
 enum AppColor: String, CaseIterable, Identifiable, Hashable {
-    case `default`, royalOrange, red, orange, yellow, green, blue, purple
+    case `default` = "Default"
+    case royalOrange = "Royal Orange"
+    case red = "Red"
+    case orange = "Orange"
+    case yellow = "Yellow"
+    case green = "Green"
+    case blue = "Blue"
+    case purple = "Purple"
     
     var id: String { self.rawValue }
     
