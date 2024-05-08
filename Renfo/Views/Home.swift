@@ -108,7 +108,7 @@ struct EditableSectionHeader: View {
                 }
                 Text(state)
                     .font(.subheadline)
-                    .fontWeight(.bold)
+//                    .fontWeight(.bold)
 //                    .fontDesign(.rounded)
                     .foregroundColor(.primary)
                 Spacer()
