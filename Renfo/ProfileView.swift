@@ -5,16 +5,31 @@ struct ProfileView: View {
     @EnvironmentObject var sessionStore: SessionStore
     @Environment(\.dismiss) var dismiss
     
+    @State private var isEditing = false
+    @State private var newName = ""
+    @State private var newEmail = ""
+    @State private var newPassword = ""
+    @State private var newProfilePicture: UIImage? = nil
+
     var body: some View {
         Form {
             Section {
                 VStack(alignment: .center, spacing: 5) {
-                    Circle()
-                        .fill(Color.gray)
+                    if let photoURL = sessionStore.userPhotoURL, !isEditing {
+                        AsyncImage(url: URL(string: photoURL)) { image in
+                            image.resizable()
+                        } placeholder: {
+                            Image("DefaultProfilePicture")
+                                .resizable()
+                        }
                         .frame(width: 100, height: 100)
-                        .overlay(Text(sessionStore.userInitials)
-                            .font(.largeTitle)
-                            .foregroundColor(.white))
+                        .clipShape(Circle())
+                    } else {
+                        Image("DefaultProfilePicture") // Use the default profile picture from your assets
+                            .resizable()
+                            .frame(width: 100, height: 100)
+                            .clipShape(Circle())
+                    }
                     
                     // Display the user's name if available
                     if let userName = sessionStore.userName {
@@ -32,7 +47,42 @@ struct ProfileView: View {
                 .listRowBackground(Color.clear)
             }
             
+            if isEditing {
+                Section(header: Text("Edit Profile")) {
+                    TextField("Name", text: $newName)
+                    TextField("Email", text: $newEmail)
+                    SecureField("Password", text: $newPassword)
+                    // Add a way for the user to select a new profile picture
+                }
+            }
+            
             Section {
+                if isEditing {
+                    Button(action: {
+                        sessionStore.updateProfile(name: newName, email: newEmail, password: newPassword, profilePicture: newProfilePicture!) { success, error in
+                            if success {
+                                isEditing = false
+                            } else {
+                                // Handle error
+                            }
+                        }
+                    }) {
+                        Text("Save")
+                            .frame(maxWidth: .infinity)
+                    }
+                } else {
+                    Button(action: {
+                        isEditing = true
+                        newName = sessionStore.userName ?? ""
+                        newEmail = sessionStore.userEmail
+                        newPassword = ""
+                        newProfilePicture = nil
+                    }) {
+                        Text("Edit")
+                            .frame(maxWidth: .infinity)
+                    }
+                }
+                
                 Button(action: {
                     sessionStore.signOut()
                     dismiss()
@@ -45,6 +95,17 @@ struct ProfileView: View {
         }
         .navigationTitle("Profile")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarItems(trailing: Button(action: {
+            isEditing.toggle()
+            if isEditing {
+                newName = sessionStore.userName ?? ""
+                newEmail = sessionStore.userEmail
+                newPassword = ""
+                newProfilePicture = nil
+            }
+        }) {
+            Text(isEditing ? "Done" : "Edit")
+        })
     }
 }
 

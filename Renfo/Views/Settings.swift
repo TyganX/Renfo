@@ -53,7 +53,7 @@ struct SettingsView: View {
                         }
                     }
                 }
-
+                
                 Section(header: Text("Appearance")) {
                     NavigationLink(value: AppTheme.system) {
                         Label("App Theme", systemImage: "paintbrush.pointed.fill")
@@ -69,12 +69,46 @@ struct SettingsView: View {
                 }
                 
                 Section(header: Text("Other")) {
-                    NavigationLink(destination: BeanBandits()) {
+                    NavigationLink(destination: ComingSoonView()) {
                         Label("About", systemImage: "info.circle.fill")
                     }
                     
                     NavigationLink(destination: BeanBandits()) {
                         Label("Bean Bandits", systemImage: "surfboard.fill")
+                    }
+                    
+                    NavigationLink(destination: ComingSoonView()) {
+                        Label("Rate App", systemImage: "star.fill")
+                    }
+                    
+                    Button(action: {
+                        let url = URL(string: "https://testflight.apple.com/join/WnvOF5Jg") // Replace with your app store link
+                        let activityVC = UIActivityViewController(activityItems: [url!], applicationActivities: nil)
+                        
+                        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                            windowScene.windows.first?.rootViewController?.present(activityVC, animated: true, completion: nil)
+                        }
+                    }) {
+                        Label {
+                            Text("Share App")
+                                .foregroundColor(.primary)
+                        } icon: {
+                            Image(systemName: "square.and.arrow.up.fill")
+                        }
+                    }
+                }
+                
+                // sign-up button
+                Section {
+                    if !sessionStore.isUserSignedIn {
+                        NavigationLink(destination: SignUpView()) {
+                            HStack {
+                                Spacer()
+                                Text("Don't have an account? Sign up")
+//                                    .foregroundColor(.blue)
+                                Spacer()
+                            }
+                        }
                     }
                 }
             }
@@ -93,6 +127,19 @@ struct SettingsView: View {
             .navigationDestination(for: AppIconSelectionView.self) { appIconSelectionView in
                 appIconSelectionView
             }
+        }
+    }
+}
+
+// MARK: - Subviews
+// Sign Up Link View
+private func signUpLink() -> some View {
+    HStack {
+        Text("Don't have an account?")
+            .foregroundColor(.gray)
+        NavigationLink(destination: SignUpView()) {
+            Text("Sign Up")
+                .foregroundColor(.blue)
         }
     }
 }
@@ -225,6 +272,12 @@ struct AppIconSelectionView: View, Hashable {
             }
         }
         .navigationBarTitle("App Icons", displayMode: .inline)
+    }
+}
+
+struct ComingSoonView: View {
+    var body: some View {
+        Text("Coming Soon")
     }
 }
 

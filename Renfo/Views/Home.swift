@@ -107,8 +107,8 @@ struct EditableSectionHeader: View {
                         .foregroundColor(tempVisibleStates[state] ?? true ? nil : .gray)
                 }
                 Text(state)
-                    .font(.subheadline)
-//                    .fontWeight(.bold)
+                    .font(.footnote)
+                    .fontWeight(.bold)
 //                    .fontDesign(.rounded)
                     .foregroundColor(.primary)
                 Spacer()

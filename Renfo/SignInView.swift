@@ -50,7 +50,7 @@ struct SignInView: View {
             Spacer()
             
             // Sign Up Navigation Link
-            signUpLink()
+//            signUpLink()
         }
         .padding()
         .alert(isPresented: $showingAlert) {

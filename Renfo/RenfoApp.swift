@@ -125,21 +125,23 @@ enum AppColor: String, CaseIterable, Identifiable, Hashable {
 class SessionStore: ObservableObject {
     @Published var isUserSignedIn: Bool = false
     @Published var userName: String?
+    @Published var userPhotoURL: String?
     var handle: AuthStateDidChangeListenerHandle?
-
+    
     init() {
         handle = Auth.auth().addStateDidChangeListener { [weak self] (auth, user) in
             self?.isUserSignedIn = user != nil
             self?.userName = user?.displayName
+            self?.userPhotoURL = user?.photoURL?.absoluteString
         }
     }
-
+    
     // Computed property to get user initials from email
     var userInitials: String {
         guard let email = Auth.auth().currentUser?.email, let firstLetter = email.first else { return "N/A" }
         return String(firstLetter).uppercased()
     }
-
+    
     // Computed property to get the user's email
     var userEmail: String {
         Auth.auth().currentUser?.email ?? "Not available"
@@ -172,6 +174,40 @@ class SessionStore: ObservableObject {
             isUserSignedIn = false
         } catch let signOutError as NSError {
             print("Error signing out: %@", signOutError)
+        }
+    }
+        
+        // Update the user's profile information
+    func updateProfile(name: String, email: String, password: String, profilePicture: UIImage, completion: @escaping (Bool, Error?) -> Void) {
+        guard let user = Auth.auth().currentUser else {
+            completion(false, nil)
+            return
+        }
+        
+        // Update the user's name and profile picture
+        let changeRequest = user.createProfileChangeRequest()
+        changeRequest.displayName = name
+        //            changeRequest.photoURL = // Upload the profilePicture to Firebase Storage and get the download URL
+        changeRequest.commitChanges { error in
+            if let error = error {
+                completion(false, error)
+            } else {
+                // Update the user's email and password
+                user.sendEmailVerification(beforeUpdatingEmail: email) { error in
+                    if let error = error {
+                        completion(false, error)
+                    } else {
+                        user.updatePassword(to: password) { error in
+                            if let error = error {
+                                completion(false, error)
+                            } else {
+                                self.userName = name
+                                completion(true, nil)
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
