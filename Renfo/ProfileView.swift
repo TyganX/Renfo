@@ -14,7 +14,7 @@ struct ProfileView: View {
     var body: some View {
         Form {
             Section {
-                VStack(alignment: .center, spacing: 5) {
+                VStack(alignment: .center, spacing: 10) {
                     if let photoURL = sessionStore.userPhotoURL, !isEditing {
                         AsyncImage(url: URL(string: photoURL)) { image in
                             image.resizable()
@@ -25,10 +25,11 @@ struct ProfileView: View {
                         .frame(width: 100, height: 100)
                         .clipShape(Circle())
                     } else {
-                        Image("DefaultProfilePicture") // Use the default profile picture from your assets
+                        Image(systemName: "person.crop.circle.fill")
                             .resizable()
                             .frame(width: 100, height: 100)
                             .clipShape(Circle())
+                            .foregroundColor(.gray)
                     }
                     
                     // Display the user's name if available
@@ -72,24 +73,13 @@ struct ProfileView: View {
                     }
                 } else {
                     Button(action: {
-                        isEditing = true
-                        newName = sessionStore.userName ?? ""
-                        newEmail = sessionStore.userEmail
-                        newPassword = ""
-                        newProfilePicture = nil
+                        sessionStore.signOut()
+                        dismiss()
                     }) {
-                        Text("Edit")
+                        Text("Sign Out")
+                            .foregroundColor(.red)
                             .frame(maxWidth: .infinity)
                     }
-                }
-                
-                Button(action: {
-                    sessionStore.signOut()
-                    dismiss()
-                }) {
-                    Text("Sign Out")
-                        .foregroundColor(.red)
-                        .frame(maxWidth: .infinity)
                 }
             }
         }
@@ -104,7 +94,7 @@ struct ProfileView: View {
                 newProfilePicture = nil
             }
         }) {
-            Text(isEditing ? "Done" : "Edit")
+            Text(isEditing ? "Cancel" : "Edit")
         })
     }
 }

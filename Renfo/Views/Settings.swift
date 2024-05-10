@@ -18,12 +18,11 @@ struct SettingsView: View {
                     if sessionStore.isUserSignedIn {
                         NavigationLink(destination: ProfileView()) {
                             HStack(spacing: 15) {
-                                Circle()
-                                    .fill(Color.gray)
+                                Image(systemName: "person.crop.circle.fill")
+                                    .resizable()
                                     .frame(width: 60, height: 60)
-                                    .overlay(Text(sessionStore.userInitials)
-                                        .font(.title2)
-                                        .foregroundColor(.white))
+                                    .clipShape(Circle())
+                                    .foregroundColor(.gray)
                                 VStack(alignment: .leading) {
                                     if let userName = sessionStore.userName { // Display the user's name if available
                                         Text(userName) // Now a computed property in SessionStore
@@ -97,20 +96,6 @@ struct SettingsView: View {
                         }
                     }
                 }
-                
-                // sign-up button
-                Section {
-                    if !sessionStore.isUserSignedIn {
-                        NavigationLink(destination: SignUpView()) {
-                            HStack {
-                                Spacer()
-                                Text("Don't have an account? Sign up")
-//                                    .foregroundColor(.blue)
-                                Spacer()
-                            }
-                        }
-                    }
-                }
             }
             .navigationTitle("Settings")
             
@@ -127,19 +112,6 @@ struct SettingsView: View {
             .navigationDestination(for: AppIconSelectionView.self) { appIconSelectionView in
                 appIconSelectionView
             }
-        }
-    }
-}
-
-// MARK: - Subviews
-// Sign Up Link View
-private func signUpLink() -> some View {
-    HStack {
-        Text("Don't have an account?")
-            .foregroundColor(.gray)
-        NavigationLink(destination: SignUpView()) {
-            Text("Sign Up")
-                .foregroundColor(.blue)
         }
     }
 }

@@ -4,55 +4,59 @@ import FirebaseAuth
 struct SignUpView: View {
     @EnvironmentObject var sessionStore: SessionStore
     @Environment(\.presentationMode) var presentationMode
+    var dismiss: DismissAction
     @State private var email: String = ""
     @State private var name: String = ""
     @State private var password: String = ""
     @State private var verifyPassword: String = ""
     @State private var showingAlert = false
     @State private var alertMessage = ""
+    @AppStorage("appColor") var appColor: AppColor = .default
     
     var body: some View {
-        VStack {
-            TextField("Email", text: $email)
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(12)
-                .padding(.bottom, 10)
-            
-            TextField("Name", text: $name)
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(12)
-                .padding(.bottom, 10)
-            
-            SecureField("Password", text: $password)
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(12)
-                .padding(.bottom, 10)
-            
-            SecureField("Verify Password", text: $verifyPassword)
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(12)
-                .padding(.bottom, 20)
-            
-            Button("Sign Up") {
-                signUp()
+            Form {
+                // Renfo Icon
+                Section {
+                    VStack(alignment: .center, spacing: 5) {
+                        Image("RenfoLogo")
+                            .resizable()
+                            .frame(width: 150, height: 150)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .listRowBackground(Color.clear)
+                
+                // Input Fields
+                Section {
+                    TextField("Email", text: $email)
+                    TextField("Name", text: $name)
+                    SecureField("Password", text: $password)
+                    SecureField("Verify Password", text: $verifyPassword)
+                }
+                
+                // Sign up Button
+                Section {
+                    Button(action: {
+//                        signUp()
+                        dismiss()
+                    }) {
+                        Text("Create Account")
+                            .foregroundColor(.blue)
+                            .frame(maxWidth: .infinity)
+                    }
+                }
             }
-            .font(.headline)
-            .foregroundColor(.white)
-            .padding()
-            .frame(width: 220, height: 60)
-            .background(Color.blue)
-            .cornerRadius(15.0)
-        }
-        .padding()
-        .alert(isPresented: $showingAlert) {
-            Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
-        }
         .navigationTitle("Sign Up")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button("Cancel") {
+                    self.presentationMode.wrappedValue.dismiss()
+//                    dismiss()
+                }
+                .foregroundColor(appColor.color)
+            }
+        }
     }
     
     func signUp() {
@@ -84,8 +88,11 @@ struct SignUpView: View {
     }
 }
 
+// MARK: - Preview Provider
 struct SignUpView_Previews: PreviewProvider {
     static var previews: some View {
-        SignUpView()
+        SignInView()
+            .environmentObject(SessionStore())
     }
 }
+
