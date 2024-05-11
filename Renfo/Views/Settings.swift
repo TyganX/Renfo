@@ -35,7 +35,7 @@ struct SettingsView: View {
                             }
                         }
                     } else {
-                        NavigationLink(destination: SignInView()) {
+                        NavigationLink(destination: AuthenticationView()) {
                             HStack(spacing: 15) {
                                 Image(systemName: "person.crop.circle.fill") // Directly use the system image
                                     .resizable() // Make the image resizable

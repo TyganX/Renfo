@@ -17,6 +17,7 @@
 		2F0DA97E2BE1305A00979111 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F0DA97D2BE1305A00979111 /* Settings.swift */; };
 		2F0DA9802BE1394700979111 /* Home.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F0DA97F2BE1394700979111 /* Home.swift */; };
 		2F0DA9822BE14A0B00979111 /* FestivalInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F0DA9812BE14A0B00979111 /* FestivalInfo.swift */; };
+		2F306BF42BEEEE7D000DD792 /* AuthenticationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F306BF32BEEEE7D000DD792 /* AuthenticationView.swift */; };
 		2FDA01482BE5598A005495A5 /* BeanBandits.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FDA01472BE5598A005495A5 /* BeanBandits.swift */; };
 		2FF991F02BE9397A00587C68 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2FF991EF2BE9397A00587C68 /* GoogleService-Info.plist */; };
 		2FF991F32BE93B0900587C68 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 2FF991F22BE93B0900587C68 /* FirebaseAnalytics */; };
@@ -40,6 +41,7 @@
 		2F0DA97D2BE1305A00979111 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		2F0DA97F2BE1394700979111 /* Home.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Home.swift; sourceTree = "<group>"; };
 		2F0DA9812BE14A0B00979111 /* FestivalInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FestivalInfo.swift; sourceTree = "<group>"; };
+		2F306BF32BEEEE7D000DD792 /* AuthenticationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationView.swift; sourceTree = "<group>"; };
 		2F4E68352BEC15B400F86888 /* Renfo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Renfo.entitlements; sourceTree = "<group>"; };
 		2FDA01472BE5598A005495A5 /* BeanBandits.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeanBandits.swift; sourceTree = "<group>"; };
 		2FF991EF2BE9397A00587C68 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -86,6 +88,7 @@
 				2F0DA9742BE12F0300979111 /* Views */,
 				2F0DA9812BE14A0B00979111 /* FestivalInfo.swift */,
 				2FF991FC2BE9631A00587C68 /* FestivalData.swift */,
+				2F306BF32BEEEE7D000DD792 /* AuthenticationView.swift */,
 				2FF991F42BE9459900587C68 /* SignInView.swift */,
 				2FF991FE2BEAA06C00587C68 /* SignUpView.swift */,
 				2FF991FA2BE9535E00587C68 /* ProfileView.swift */,
@@ -208,6 +211,7 @@
 				2F0DA97A2BE1301000979111 /* Functions.swift in Sources */,
 				2FF991FF2BEAA06C00587C68 /* SignUpView.swift in Sources */,
 				2FF991F52BE9459900587C68 /* SignInView.swift in Sources */,
+				2F306BF42BEEEE7D000DD792 /* AuthenticationView.swift in Sources */,
 				2FF991FD2BE9631A00587C68 /* FestivalData.swift in Sources */,
 				2FF991FB2BE9535E00587C68 /* ProfileView.swift in Sources */,
 				2F0DA9652BE12EC800979111 /* RenfoApp.swift in Sources */,
