@@ -68,7 +68,7 @@ struct SettingsView: View {
                 }
                 
                 Section(header: Text("Other")) {
-                    NavigationLink(destination: ComingSoonView()) {
+                    NavigationLink(destination: AboutView()) {
                         Label("About", systemImage: "info.circle.fill")
                     }
                     

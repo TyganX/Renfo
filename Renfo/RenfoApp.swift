@@ -176,9 +176,20 @@ class SessionStore: ObservableObject {
             print("Error signing out: %@", signOutError)
         }
     }
+    
+    // Update the user's password
+    func updatePassword(newPassword: String, completion: @escaping (Bool, Error?) -> Void) {
+        Auth.auth().currentUser?.updatePassword(to: newPassword) { error in
+            if let error = error {
+                completion(false, error)
+            } else {
+                completion(true, nil)
+            }
+        }
+    }
         
         // Update the user's profile information
-    func updateProfile(name: String, email: String, password: String, profilePicture: UIImage, completion: @escaping (Bool, Error?) -> Void) {
+    func updateProfile(name: String, email: String, password: String, profilePicture: UIImage?, completion: @escaping (Bool, Error?) -> Void) {
         guard let user = Auth.auth().currentUser else {
             completion(false, nil)
             return
@@ -187,7 +198,9 @@ class SessionStore: ObservableObject {
         // Update the user's name and profile picture
         let changeRequest = user.createProfileChangeRequest()
         changeRequest.displayName = name
-        //            changeRequest.photoURL = // Upload the profilePicture to Firebase Storage and get the download URL
+        if let profilePicture = profilePicture {
+            // Upload the profilePicture to Firebase Storage and get the download URL
+        }
         changeRequest.commitChanges { error in
             if let error = error {
                 completion(false, error)

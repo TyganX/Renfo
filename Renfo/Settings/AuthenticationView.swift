@@ -1,7 +1,9 @@
 import SwiftUI
 import FirebaseAuth
 
+// MARK: - Authentication View
 struct AuthenticationView: View {
+    // MARK: - Environment Objects and States
     @EnvironmentObject var sessionStore: SessionStore
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.dismiss) var dismiss
@@ -13,6 +15,7 @@ struct AuthenticationView: View {
     @State private var alertMessage = ""
     @State private var isShowingSignUp = false
 
+    // MARK: - View Body
     var body: some View {
         VStack {
             Form {
@@ -70,6 +73,8 @@ struct AuthenticationView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 
+    // MARK: - Functions
+    // Function to handle user sign in
     func logIn() {
         Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
             if let error = error {
@@ -83,6 +88,7 @@ struct AuthenticationView: View {
         dismiss()
     }
 
+    // Function to handle user sign up
     func signUp() {
         guard password == verifyPassword else {
             self.alertMessage = "Passwords do not match."
@@ -90,7 +96,6 @@ struct AuthenticationView: View {
             return
         }
         
-        // Check if the name field is empty
         guard !name.isEmpty else {
             self.alertMessage = "Please enter your name."
             self.showingAlert = true
