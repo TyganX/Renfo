@@ -16,7 +16,7 @@ struct SettingsView: View {
                 // Profile Header Section
                 Section {
                     if sessionStore.isUserSignedIn {
-                        NavigationLink(destination: ProfileView()) {
+                        NavigationLink(destination: AccountView()) {
                             HStack(spacing: 15) {
                                 Image(systemName: "person.crop.circle.fill")
                                     .resizable()

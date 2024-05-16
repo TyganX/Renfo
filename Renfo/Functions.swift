@@ -117,3 +117,24 @@ struct ImageView: View {
         }
     }
 }
+
+func convertStringToDate(dateString: String) -> Date? {
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "MM/dd/yyyy"
+    return dateFormatter.date(from: dateString)
+}
+
+struct PulsingView: View {
+    @State private var isAnimating = false
+
+    var body: some View {
+        Circle()
+            .scaleEffect(isAnimating ? 1.3 : 1.0)
+            .opacity(isAnimating ? 0.5 : 1.0)
+            .onAppear {
+                withAnimation(Animation.easeInOut(duration: 0.5).repeatForever(autoreverses: true)) {
+                    isAnimating = true
+                }
+            }
+    }
+}

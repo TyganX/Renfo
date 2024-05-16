@@ -4,6 +4,7 @@ import SwiftUI
 // MARK: - Festival View
 struct FestivalView: View {
     @AppStorage("appColor") var appColor: AppColor = .default
+    @State private var showingPopover = false
     var festival: FestivalInfo
     
     var body: some View {
@@ -41,7 +42,7 @@ struct FestivalView: View {
                             .buttonStyle(.bordered)
                             
                             Spacer() // Add a spacer between buttons
-
+                            
                             Button(action: {
                                 // Action to send an email to the festival's email address
                                 let email = "mailto:\(festival.email)"
@@ -60,7 +61,7 @@ struct FestivalView: View {
                             .buttonStyle(.bordered)
                             
                             Spacer() // Add a spacer between buttons
-
+                            
                             Button(action: {
                                 // Action to open the festival's map link
                                 if let url = URL(string: festival.mapLink) {
@@ -100,38 +101,46 @@ struct FestivalView: View {
                     .listRowInsets(EdgeInsets())
                     .listRowBackground(Color.clear)
                 }
-
+                
                 Section(header: Text("Resources")) {
-                    NavigationLink(destination: ImageView(imageName: festival.festivalMapImageName)) {
-                        Label("Festival Map", systemImage: "map.fill")
+                    if !festival.festivalMapImageName.isEmpty {
+                        NavigationLink(destination: ImageView(imageName: festival.festivalMapImageName)) {
+                            Label("Festival Map", systemImage: "map.fill")
+                        }
                     }
                     
-                    NavigationLink(destination: ImageView(imageName: festival.campgroundMapImageName)) {
-                        Label("Campground Map", systemImage: "map.circle.fill")
+                    if !festival.campgroundMapImageName.isEmpty {
+                        NavigationLink(destination: ImageView(imageName: festival.campgroundMapImageName)) {
+                            Label("Campground Map", systemImage: "map.circle.fill")
+                        }
                     }
                     
-                    URLButtonInApp(label: "Tickets", systemImage: "ticket.fill", urlString: festival.ticketsURL)
+                    if !festival.ticketsURL.isEmpty {
+                        URLButtonInApp(label: "Tickets", systemImage: "ticket.fill", urlString: festival.ticketsURL)
+                    }
                     
-                    URLButtonInApp(label: "Lost & Found", systemImage: "questionmark.app.fill", urlString: festival.lostAndFoundURL)
+                    if !festival.lostAndFoundURL.isEmpty {
+                        URLButtonInApp(label: "Lost & Found", systemImage: "questionmark.app.fill", urlString: festival.lostAndFoundURL)
+                    }
                 }
             }
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarItems(trailing: HStack {
-            ForEach(festival.activeMonths, id: \.self) { month in
-                Button(action: {
-                    // This space intentionally left blank to disable the button action.
-                }) {
-                    VStack {
-                        Text(month)
-                            .font(.caption)
-//                            .fontWeight(.bold)
-//                            .foregroundColor(appColor.color)
-                    }
+            // Active Indicator Button
+            let startDate = convertStringToDate(dateString: festival.startDate)
+            let endDate = convertStringToDate(dateString: festival.endDate)
+            let currentDate = Date()
+            let isCurrentDateWithinFestival = startDate != nil && endDate != nil && (startDate!...endDate!).contains(currentDate)
+
+            Menu {
+                Button(action: {}) {
+                    Text("    \(festival.startDate) - \(festival.endDate)")
                 }
-                .buttonStyle(.bordered)
-//                .disabled(true) // This disables the button
-//                .foregroundColor(appColor.color)
+            } label: {
+                PulsingView()
+                    .foregroundColor(isCurrentDateWithinFestival ? .green : .red)
+                    .frame(width: 10, height: 10)
             }
         })
     }

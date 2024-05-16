@@ -38,3 +38,16 @@
 //  Created by Daniil Manin on 28.09.2021.
 //  Copyright © 2021 Exyte. All rights reserved.
 //
+
+//// Buttons for active months
+//ForEach(festival.activeMonths, id: \.self) { month in
+//    Button(action: {
+//        // This space intentionally left blank to disable the button action.
+//    }) {
+//        VStack {
+//            Text(month)
+//                .font(.caption)
+//        }
+//    }
+//    .buttonStyle(.bordered)
+//}

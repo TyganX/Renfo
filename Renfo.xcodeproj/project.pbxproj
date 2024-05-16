@@ -28,7 +28,7 @@
 		2FF991F52BE9459900587C68 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FF991F42BE9459900587C68 /* SignInView.swift */; };
 		2FF991F72BE9488E00587C68 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 2FF991F62BE9488E00587C68 /* FirebaseAuth */; };
 		2FF991F92BE9488E00587C68 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 2FF991F82BE9488E00587C68 /* FirebaseFirestore */; };
-		2FF991FB2BE9535E00587C68 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FF991FA2BE9535E00587C68 /* ProfileView.swift */; };
+		2FF991FB2BE9535E00587C68 /* AccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FF991FA2BE9535E00587C68 /* AccountView.swift */; };
 		2FF991FD2BE9631A00587C68 /* FestivalData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FF991FC2BE9631A00587C68 /* FestivalData.swift */; };
 		2FF991FF2BEAA06C00587C68 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FF991FE2BEAA06C00587C68 /* SignUpView.swift */; };
 /* End PBXBuildFile section */
@@ -53,7 +53,7 @@
 		2FDA01472BE5598A005495A5 /* BeanBandits.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeanBandits.swift; sourceTree = "<group>"; };
 		2FF991EF2BE9397A00587C68 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		2FF991F42BE9459900587C68 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
-		2FF991FA2BE9535E00587C68 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		2FF991FA2BE9535E00587C68 /* AccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountView.swift; sourceTree = "<group>"; };
 		2FF991FC2BE9631A00587C68 /* FestivalData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FestivalData.swift; sourceTree = "<group>"; };
 		2FF991FE2BEAA06C00587C68 /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -93,16 +93,15 @@
 			isa = PBXGroup;
 			children = (
 				2F4E68352BEC15B400F86888 /* Renfo.entitlements */,
-				2F306BF52BF08EFF000DD792 /* Archive */,
+				2F0DA9642BE12EC800979111 /* RenfoApp.swift */,
+				2F0DA9662BE12EC800979111 /* ContentView.swift */,
 				2F0DA9742BE12F0300979111 /* Home */,
 				2F306BFB2BF1C97B000DD792 /* Calendar */,
 				2F306BFA2BF1C930000DD792 /* Settings */,
-				2FF991FC2BE9631A00587C68 /* FestivalData.swift */,
+				2F306BF52BF08EFF000DD792 /* Archive */,
 				2F0DA9792BE1301000979111 /* Functions.swift */,
 				2F0DA9812BE14A0B00979111 /* FestivalInfo.swift */,
 				2F306BF62BF091F7000DD792 /* MapView.swift */,
-				2F0DA9642BE12EC800979111 /* RenfoApp.swift */,
-				2F0DA9662BE12EC800979111 /* ContentView.swift */,
 				2F0DA9682BE12EC800979111 /* Item.swift */,
 				2F0DA96A2BE12EC900979111 /* Assets.xcassets */,
 				2FF991EF2BE9397A00587C68 /* GoogleService-Info.plist */,
@@ -131,6 +130,7 @@
 		2F306BF52BF08EFF000DD792 /* Archive */ = {
 			isa = PBXGroup;
 			children = (
+				2FF991FC2BE9631A00587C68 /* FestivalData.swift */,
 				2FF991F42BE9459900587C68 /* SignInView.swift */,
 				2FF991FE2BEAA06C00587C68 /* SignUpView.swift */,
 			);
@@ -142,7 +142,7 @@
 			children = (
 				2F0DA97D2BE1305A00979111 /* SettingsView.swift */,
 				2F306BF32BEEEE7D000DD792 /* AuthenticationView.swift */,
-				2FF991FA2BE9535E00587C68 /* ProfileView.swift */,
+				2FF991FA2BE9535E00587C68 /* AccountView.swift */,
 				2F306BFC2BF1CA11000DD792 /* AboutView.swift */,
 				2FDA01472BE5598A005495A5 /* BeanBandits.swift */,
 			);
@@ -253,7 +253,7 @@
 				2FF991F52BE9459900587C68 /* SignInView.swift in Sources */,
 				2F306BF42BEEEE7D000DD792 /* AuthenticationView.swift in Sources */,
 				2FF991FD2BE9631A00587C68 /* FestivalData.swift in Sources */,
-				2FF991FB2BE9535E00587C68 /* ProfileView.swift in Sources */,
+				2FF991FB2BE9535E00587C68 /* AccountView.swift in Sources */,
 				2F0DA9652BE12EC800979111 /* RenfoApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -1,7 +1,7 @@
 import SwiftUI
 import Firebase
 
-struct ProfileView: View {
+struct AccountView: View {
     @EnvironmentObject var sessionStore: SessionStore
     @Environment(\.dismiss) var dismiss
     
@@ -100,7 +100,7 @@ struct ProfileView: View {
                 }
             }
         }
-        .navigationTitle("Profile")
+        .navigationTitle("Account")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarItems(trailing: Button(action: {
             isEditing.toggle()
@@ -190,9 +190,9 @@ struct ChangePasswordView: View {
     }
 }
 
-struct ProfileView_Previews: PreviewProvider {
+struct AccountView_Previews: PreviewProvider {
     static var previews: some View {
-        ProfileView()
+        AccountView()
             .environmentObject(SessionStore())
     }
 }
