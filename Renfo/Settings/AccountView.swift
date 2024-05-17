@@ -192,8 +192,10 @@ struct ChangePasswordView: View {
 
 struct AccountView_Previews: PreviewProvider {
     static var previews: some View {
-        AccountView()
-            .environmentObject(SessionStore())
+        NavigationView {
+            AccountView()
+                .environmentObject(SessionStore())
+        }
     }
 }
 

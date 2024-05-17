@@ -40,6 +40,8 @@ struct BeanBandits: View {
 
 struct BeanBandits_Previews: PreviewProvider {
     static var previews: some View {
-        BeanBandits()
+        NavigationView {
+            BeanBandits()
+        }
     }
 }

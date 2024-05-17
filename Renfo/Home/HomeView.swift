@@ -18,7 +18,7 @@ struct HomeView: View {
     @Environment(\.scenePhase) private var scenePhase
 
     // MARK: - Festival Data
-    let festivals: [FestivalInfo] = [
+    let festivals: [FestivalData] = [
                louisianaRenaissanceFestival,
                marylandRenaissanceFestival,
                northernCaliforniaRenaissanceFaire,
@@ -30,7 +30,7 @@ struct HomeView: View {
            ]
 
     // MARK: - Grouped Festivals by State
-    var groupedFestivals: [String: [FestivalInfo]] {
+    var groupedFestivals: [String: [FestivalData]] {
         Dictionary(grouping: festivals, by: { $0.state })
     }
 

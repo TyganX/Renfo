@@ -14,26 +14,36 @@ struct URLButton: View {
     let systemImage: String
     let urlString: String
 
-
-
     var body: some View {
         Button(action: {
-            openURL(urlString: urlString)
-        }) {
-            HStack {
-                Label(label, systemImage: systemImage)
-                Spacer()
-//                Image(systemName: "link")
-//                    .foregroundColor(.gray)
+            if let url = URL(string: urlString) {
+                UIApplication.shared.open(url)
             }
+        }) {
+            Label(label, systemImage: systemImage)
         }
         .buttonStyle(PlainButtonStyle())
     }
+}
 
-    func openURL(urlString: String) {
-        if let url = URL(string: urlString) {
-            UIApplication.shared.open(url)
+struct URLButtonCustom: View {
+    let label: String
+    let image: Image
+    let urlString: String
+
+    var body: some View {
+        Button(action: {
+            if let url = URL(string: urlString) {
+                UIApplication.shared.open(url)
+            }
+        }) {
+            Label {
+                Text(label)
+            } icon: {
+                image
+            }
         }
+        .buttonStyle(PlainButtonStyle())
     }
 }
 
@@ -132,7 +142,7 @@ struct PulsingView: View {
             .scaleEffect(isAnimating ? 1.3 : 1.0)
             .opacity(isAnimating ? 0.5 : 1.0)
             .onAppear {
-                withAnimation(Animation.easeInOut(duration: 0.5).repeatForever(autoreverses: true)) {
+                withAnimation(Animation.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
                     isAnimating = true
                 }
             }
