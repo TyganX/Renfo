@@ -43,7 +43,7 @@ struct FestivalView: View {
                     .edgesIgnoringSafeArea(.top)
                     .frame(height: 300)
                 
-                VStack(alignment: .center, spacing: 20) {
+                VStack(alignment: .center, spacing: 0) {
                     Image(festival.logoImageName)
                         .resizable()
                         .scaledToFit()
@@ -52,6 +52,7 @@ struct FestivalView: View {
                     Text(festival.name)
                         .font(.title3)
                         .fontWeight(.bold)
+                        .padding(.bottom)
                     
                     headerButtons
                 }
@@ -85,7 +86,9 @@ struct FestivalView: View {
         }) {
             VStack {
                 Image(systemName: "phone.fill")
-                    .frame(maxHeight: .infinity)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 22, height: 20)
                 Text("call")
                     .font(.caption)
             }
@@ -105,7 +108,9 @@ struct FestivalView: View {
         }) {
             VStack {
                 Image(systemName: "envelope.fill")
-                    .frame(maxHeight: .infinity)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 22, height: 20)
                 Text("mail")
                     .font(.caption)
             }
@@ -124,7 +129,9 @@ struct FestivalView: View {
         }) {
             VStack {
                 Image(systemName: "location.fill")
-                    .frame(maxHeight: .infinity)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 22, height: 20)
                 Text("maps")
                     .font(.caption)
             }
@@ -143,7 +150,9 @@ struct FestivalView: View {
         }) {
             VStack {
                 Image(systemName: "globe")
-                    .frame(maxHeight: .infinity)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 22, height: 20)
                 Text("website")
                     .font(.caption)
             }
