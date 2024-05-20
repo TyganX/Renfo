@@ -1,45 +1,62 @@
 import SwiftUI
 import Firebase
+import Combine
 
 struct AccountView: View {
     @EnvironmentObject var sessionStore: SessionStore
     @Environment(\.dismiss) var dismiss
-    
+
     @State private var isEditing = false
     @State private var newName = ""
     @State private var newEmail = ""
     @State private var newPassword = ""
     @State private var isPasswordModalPresented = false
     @State private var newProfilePicture: UIImage? = nil
+    @State private var cancellables = Set<AnyCancellable>()
+
+    @State private var showingImagePicker = false
+    @State private var inputImage: UIImage?
 
     var body: some View {
         Form {
             Section {
                 VStack(alignment: .center, spacing: 10) {
-                    if let photoURL = sessionStore.userPhotoURL, !isEditing {
-                        AsyncImage(url: URL(string: photoURL)) { image in
-                            image.resizable()
-                        } placeholder: {
-                            Image("DefaultProfilePicture")
-                                .resizable()
-                        }
-                        .frame(width: 100, height: 100)
-                        .clipShape(Circle())
-                    } else {
-                        Image(systemName: "person.crop.circle.fill")
-                            .resizable()
+                    ZStack {
+                        if let photoURL = sessionStore.userPhotoURL, !isEditing {
+                            AsyncImage(url: URL(string: photoURL)) { image in
+                                image.resizable()
+                            } placeholder: {
+                                Image("DefaultProfilePicture")
+                                    .resizable()
+                            }
                             .frame(width: 100, height: 100)
                             .clipShape(Circle())
-                            .foregroundColor(.gray)
+                        } else {
+                            Image(systemName: "person.crop.circle.fill")
+                                .resizable()
+                                .frame(width: 100, height: 100)
+                                .clipShape(Circle())
+                                .foregroundColor(.gray)
+                                .onTapGesture {
+                                    if isEditing {
+                                        showingImagePicker = true
+                                    }
+                                }
+                        }
+
+                        if isEditing {
+                            Circle()
+                                .strokeBorder(Color.blue, lineWidth: 2)
+                                .frame(width: 100, height: 100)
+                        }
                     }
-                    
-                    // Display the user's name if available
+
                     if let userName = sessionStore.userName {
                         Text(userName)
                             .font(.title)
                             .frame(maxWidth: .infinity, alignment: .center)
                     }
-                    
+
                     Text(sessionStore.userEmail)
                         .foregroundColor(.gray)
                         .frame(maxWidth: .infinity, alignment: .center)
@@ -47,7 +64,7 @@ struct AccountView: View {
                 .frame(maxWidth: .infinity)
                 .listRowBackground(Color.clear)
             }
-            
+
             if isEditing {
                 Section(header: Text("Edit Profile")) {
                     HStack {
@@ -55,13 +72,13 @@ struct AccountView: View {
                         Spacer(minLength: 50)
                         TextField("Name", text: $newName)
                     }
-                    
+
                     HStack {
-                        Text("Email ")
+                        Text("Email")
                         Spacer(minLength: 50)
                         TextField("Email", text: $newEmail)
                     }
-                    
+
                     Button(action: { isPasswordModalPresented = true }) {
                         Text("Change Password")
                     }
@@ -70,29 +87,15 @@ struct AccountView: View {
                     }
                 }
             }
-            
+
             Section {
                 if isEditing {
-                    Button(action: {
-                        sessionStore.updateProfile(name: newName, email: newEmail, password: newPassword, profilePicture: newProfilePicture) { success, error in
-                            DispatchQueue.main.async {
-                                if success {
-                                    isEditing = false
-                                } else {
-                                    // Handle error
-                                    print("Error updating profile: \(error?.localizedDescription ?? "Unknown error")")
-                                }
-                            }
-                        }
-                    }) {
+                    Button(action: updateProfile) {
                         Text("Save")
                             .frame(maxWidth: .infinity)
                     }
                 } else {
-                    Button(action: {
-                        sessionStore.signOut()
-                        dismiss()
-                    }) {
+                    Button(action: signOut) {
                         Text("Sign Out")
                             .foregroundColor(.red)
                             .frame(maxWidth: .infinity)
@@ -113,6 +116,36 @@ struct AccountView: View {
         }) {
             Text(isEditing ? "Cancel" : "Edit")
         })
+        .sheet(isPresented: $showingImagePicker) {
+            ImagePicker(image: $inputImage)
+                .onChange(of: inputImage) {
+                    loadImage()
+                }
+        }
+    }
+
+    private func updateProfile() {
+        sessionStore.updateProfile(name: newName, email: newEmail, profilePicture: newProfilePicture)
+            .sink(receiveCompletion: { completion in
+                if case .failure(let error) = completion {
+                    print("Error updating profile: \(error.localizedDescription)")
+                }
+            }, receiveValue: { success in
+                if success {
+                    isEditing = false
+                }
+            })
+            .store(in: &cancellables)
+    }
+
+    private func signOut() {
+        sessionStore.signOut()
+        dismiss()
+    }
+
+    private func loadImage() {
+        guard let inputImage = inputImage else { return }
+        newProfilePicture = inputImage
     }
 }
 
@@ -126,7 +159,7 @@ struct ChangePasswordView: View {
     @ObservedObject var sessionStore = SessionStore()
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 Section(footer: Text("Your password must be at least 6 characters.")) {
                     HStack {
@@ -134,7 +167,7 @@ struct ChangePasswordView: View {
                         Spacer(minLength: 50)
                         SecureField("enter password", text: $newPassword)
                     }
-                    
+
                     HStack {
                         Text("Verify")
                         Spacer(minLength: 40)
@@ -163,20 +196,24 @@ struct ChangePasswordView: View {
             }
         }
     }
-    
+
     private func handleChangePassword() {
         if newPassword == confirmPassword {
             if newPassword.count >= 6 {
-                sessionStore.updatePassword(newPassword: newPassword) { success, error in
-                    DispatchQueue.main.async {
+                sessionStore.updatePassword(newPassword: newPassword)
+                    .sink(receiveCompletion: { completion in
+                        if case .failure(let error) = completion {
+                            print("Error updating password: \(error.localizedDescription)")
+                            alertTitle = "Error"
+                            alertMessage = error.localizedDescription
+                            showingAlert = true
+                        }
+                    }, receiveValue: { success in
                         if success {
                             dismiss()
-                        } else {
-                            // Handle error
-                            print("Error updating password: \(error?.localizedDescription ?? "Unknown error")")
                         }
-                    }
-                }
+                    })
+                    .store(in: &sessionStore.cancellables)
             } else {
                 alertTitle = "Weak Password"
                 alertMessage = "Your password must be at least 6 characters."
@@ -198,61 +235,3 @@ struct AccountView_Previews: PreviewProvider {
         }
     }
 }
-
-//struct ChangePasswordView: View {
-//    @Environment(\.dismiss) var dismiss
-//    @State private var newPassword = ""
-//    @State private var confirmPassword = ""
-//    @ObservedObject var sessionStore = SessionStore()
-//    
-//    var body: some View {
-//        NavigationView {
-//            Form {
-//                Section(footer: Text("Your password must be at least 6 characters.")) {
-//                    HStack {
-//                        Text("New")
-//                        Spacer(minLength: 50)
-//                        SecureField("enter password", text: $newPassword)
-//                    }
-//                    
-//                    HStack {
-//                        Text("Verify")
-//                        Spacer(minLength: 40)
-//                        SecureField("re-enter password", text: $confirmPassword)
-//                    }
-//                }
-//            }
-//            .navigationTitle("Change Password")
-//            .navigationBarTitleDisplayMode(.inline)
-//            .toolbar {
-//                ToolbarItem(placement: .navigationBarLeading) {
-//                    Button("Cancel") {
-//                        dismiss()
-//                    }
-//                }
-//                ToolbarItem(placement: .navigationBarTrailing) {
-//                    Button(action: handleChangePassword) {
-//                        Text("Change")
-//                            .bold()
-//                    }
-//                    .disabled(newPassword.isEmpty || confirmPassword.isEmpty)
-//                }
-//            }
-//        }
-//    }
-//    
-//    private func handleChangePassword() {
-//        if newPassword == confirmPassword && newPassword.count >= 6 {
-//            sessionStore.updatePassword(newPassword: newPassword) { success, error in
-//                DispatchQueue.main.async {
-//                    if success {
-//                        dismiss()
-//                    } else {
-//                        // Handle error
-//                        print("Error updating password: \(error?.localizedDescription ?? "Unknown error")")
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}

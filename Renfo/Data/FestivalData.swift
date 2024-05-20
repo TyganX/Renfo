@@ -2,6 +2,7 @@ import Foundation
 
 // Define the properties of each festival
 struct FestivalData {
+    var id: String
     var name: String
     var description: String
     var logoImageName: String
@@ -32,6 +33,7 @@ struct FestivalData {
 
 // Create instances of FestivalInfo for each festival
 let texasRenaissanceFestival = FestivalData(
+    id: "TRF",
     name: "Texas Renaissance Festival",
     description: "A grand celebration of medieval culture.",
     logoImageName: "TRFLogo",
@@ -61,6 +63,7 @@ let texasRenaissanceFestival = FestivalData(
 )
 
 let sherwoodForestFaire = FestivalData(
+    id: "SFF",
     name: "Sherwood Forest Faire",
     description: "Witness the thrilling sport of kings.",
     logoImageName: "SFFLogo",
@@ -90,6 +93,7 @@ let sherwoodForestFaire = FestivalData(
 )
 
 let scarboroughRenaissanceFestival = FestivalData(
+    id: "SRF",
     name: "Scarborough Renaissance Festival",
     description: "A grand celebration of medieval culture.",
     logoImageName: "SRFLogo",
@@ -119,6 +123,7 @@ let scarboroughRenaissanceFestival = FestivalData(
 )
 
 let marylandRenaissanceFestival = FestivalData(
+    id: "MDRF",
     name: "Maryland Renaissance Festival",
     description: "A grand celebration of medieval culture.",
     logoImageName: "MDRFLogo",
@@ -148,6 +153,7 @@ let marylandRenaissanceFestival = FestivalData(
 )
 
 let renaissancePleasureFaire = FestivalData(
+    id: "RPF",
     name: "Renaissance Pleasure Faire",
     description: "A grand celebration of medieval culture.",
     logoImageName: "RPFLogo",
@@ -177,6 +183,7 @@ let renaissancePleasureFaire = FestivalData(
 )
 
 let louisianaRenaissanceFestival = FestivalData(
+    id: "LRF",
     name: "Louisiana Renaissance Festival",
     description: "A grand celebration of medieval culture.",
     logoImageName: "LRFLogo",
@@ -206,11 +213,12 @@ let louisianaRenaissanceFestival = FestivalData(
 )
 
 let northernCaliforniaRenaissanceFaire = FestivalData(
+    id: "NCRF",
     name: "Northern California Renaissance Faire",
     description: "A grand celebration of medieval culture.",
     logoImageName: "NCRFLogo",
     established: "2004",
-    phoneNumber: "",
+    phoneNumber: "408-847-3247",
     email: "entertainment@norcalrenfaire.com",
     mapLink: "https://maps.apple.com/?q=Northern+California+Renaissance+Faire",
     websiteURL: "https://norcalrenfaire.com/",

@@ -1,8 +1,9 @@
 import Foundation
 import SwiftUI
+import MessageUI
 
 // MARK: - Home View
-struct HomeView: View {
+struct FestivalListView: View {
     // MARK: - State Properties
     @State private var visibleStates: [String: Bool] {
         didSet {
@@ -16,18 +17,21 @@ struct HomeView: View {
     @State private var tempVisibleStates: [String: Bool]
     @State private var searchText = "" // Added for search functionality
     @Environment(\.scenePhase) private var scenePhase
+    @State private var showingMailView = false
+    @State private var result: MFMailComposeResult? = nil
+    @State private var showAlert = false
 
     // MARK: - Festival Data
     let festivals: [FestivalData] = [
-               louisianaRenaissanceFestival,
-               marylandRenaissanceFestival,
-               northernCaliforniaRenaissanceFaire,
-               renaissancePleasureFaire,
-               scarboroughRenaissanceFestival,
-               sherwoodForestFaire,
-               texasRenaissanceFestival,
-               // Add more festivals as needed
-           ]
+        louisianaRenaissanceFestival,
+        marylandRenaissanceFestival,
+        northernCaliforniaRenaissanceFaire,
+        renaissancePleasureFaire,
+        scarboroughRenaissanceFestival,
+        sherwoodForestFaire,
+        texasRenaissanceFestival,
+        // Add more festivals as needed
+    ]
 
     // MARK: - Grouped Festivals by State
     var groupedFestivals: [String: [FestivalData]] {
@@ -35,16 +39,16 @@ struct HomeView: View {
     }
 
     init() {
-            // Load the visibleStates from UserDefaults or default to all true
-            if let savedStates = UserDefaults.standard.data(forKey: "visibleStates"),
-               let decodedStates = try? JSONDecoder().decode([String: Bool].self, from: savedStates) {
-                _visibleStates = State(initialValue: decodedStates)
-            } else {
-                let initialStates = Dictionary(grouping: festivals, by: { $0.state }).keys
-                _visibleStates = State(initialValue: initialStates.reduce(into: [:]) { $0[$1] = true })
-            }
-            _tempVisibleStates = State(initialValue: _visibleStates.wrappedValue)
+        // Load the visibleStates from UserDefaults or default to all true
+        if let savedStates = UserDefaults.standard.data(forKey: "visibleStates"),
+           let decodedStates = try? JSONDecoder().decode([String: Bool].self, from: savedStates) {
+            _visibleStates = State(initialValue: decodedStates)
+        } else {
+            let initialStates = Dictionary(grouping: festivals, by: { $0.state }).keys
+            _visibleStates = State(initialValue: initialStates.reduce(into: [:]) { $0[$1] = true })
         }
+        _tempVisibleStates = State(initialValue: _visibleStates.wrappedValue)
+    }
 
     // MARK: - View Body
     var body: some View {
@@ -67,12 +71,41 @@ struct HomeView: View {
                         }
                     }
                 }
+                // Add Button as a footer
+                if editMode == .inactive {
+                    Section {
+                        HStack {
+                            Text("Don't see a festival?")
+                            Button(action: {
+                                if MFMailComposeViewController.canSendMail() {
+                                    showingMailView.toggle()
+                                } else {
+                                    showAlert = true
+                                }
+                            }) {
+                                Text("Add it now!")
+                            }
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .listRowBackground(Color.clear)
+                }
             }
             .searchable(text: $searchText, prompt: "Search") // Search bar added here
             .navigationTitle("Renfo")
             .environment(\.editMode, $editMode)
             .toolbar {
                 EditButton(editMode: $editMode, visibleStates: $visibleStates, tempVisibleStates: $tempVisibleStates)
+            }
+            .sheet(isPresented: $showingMailView) {
+                MailView(result: $result)
+            }
+            .alert(isPresented: $showAlert) {
+                Alert(
+                    title: Text("Cannot Send Mail"),
+                    message: Text("Your device is not configured to send mail. Please configure a mail account in the Mail app or contact support."),
+                    dismissButton: .default(Text("OK"))
+                )
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
@@ -142,9 +175,49 @@ struct EditButton: View {
     }
 }
 
+// MARK: - Mail View
+struct MailView: UIViewControllerRepresentable {
+    @Binding var result: MFMailComposeResult?
+
+    class Coordinator: NSObject, MFMailComposeViewControllerDelegate {
+        @Binding var result: MFMailComposeResult?
+
+        init(result: Binding<MFMailComposeResult?>) {
+            _result = result
+        }
+
+        func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+            defer {
+                controller.dismiss(animated: true, completion: nil)
+            }
+            self.result = result
+        }
+    }
+
+    func makeCoordinator() -> Coordinator {
+        return Coordinator(result: $result)
+    }
+
+    func makeUIViewController(context: UIViewControllerRepresentableContext<MailView>) -> MFMailComposeViewController {
+        let vc = MFMailComposeViewController()
+        vc.setToRecipients(["request@renfo.app"])
+        vc.setSubject("Festival Request")
+        vc.setMessageBody("I would like to request the addition of the following festival:\n\nFestival Name: ", isHTML: false)
+        vc.mailComposeDelegate = context.coordinator
+        return vc
+    }
+
+    func updateUIViewController(_ uiViewController: MFMailComposeViewController, context: UIViewControllerRepresentableContext<MailView>) {
+    }
+
+    static var canSendMail: Bool {
+        return MFMailComposeViewController.canSendMail()
+    }
+}
+
 // MARK: - Preview Provider
-struct HomeView_Previews: PreviewProvider {
+struct FestivalListView_Previews: PreviewProvider {
     static var previews: some View {
-        HomeView()
+        FestivalListView()
     }
 }

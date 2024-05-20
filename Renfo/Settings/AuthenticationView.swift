@@ -1,9 +1,9 @@
 import SwiftUI
 import FirebaseAuth
+import Combine
 
 // MARK: - Authentication View
 struct AuthenticationView: View {
-    // MARK: - Environment Objects and States
     @EnvironmentObject var sessionStore: SessionStore
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.dismiss) var dismiss
@@ -14,12 +14,11 @@ struct AuthenticationView: View {
     @State private var showingAlert = false
     @State private var alertMessage = ""
     @State private var isShowingSignUp = false
+    @State private var cancellables = Set<AnyCancellable>()
 
-    // MARK: - View Body
     var body: some View {
         VStack {
             Form {
-                // Renfo Icon
                 Section {
                     VStack(alignment: .center, spacing: 5) {
                         Image("RenfoLogo")
@@ -30,7 +29,6 @@ struct AuthenticationView: View {
                 .frame(maxWidth: .infinity)
                 .listRowBackground(Color.clear)
                 
-                // Input Fields
                 Section {
                     TextField("Email", text: $email)
                     if isShowingSignUp {
@@ -42,7 +40,6 @@ struct AuthenticationView: View {
                     }
                 }
                 
-                // Sign In/Up Button
                 Section {
                     Button(action: {
                         isShowingSignUp ? signUp() : logIn()
@@ -53,7 +50,6 @@ struct AuthenticationView: View {
                     }
                 }
                 
-                // Switch to Sign Up/In Button
                 Section {
                     HStack {
                         Text(isShowingSignUp ? "Already have an account?" : "Don't have an account?")
@@ -71,24 +67,26 @@ struct AuthenticationView: View {
         }
         .navigationTitle(isShowingSignUp ? "Sign Up" : "Sign In")
         .navigationBarTitleDisplayMode(.inline)
-    }
-
-    // MARK: - Functions
-    // Function to handle user sign in
-    func logIn() {
-        Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
-            if let error = error {
-                self.alertMessage = error.localizedDescription
-                self.showingAlert = true
-            } else {
-                self.sessionStore.isUserSignedIn = true
-                self.presentationMode.wrappedValue.dismiss()
-            }
+        .alert(isPresented: $showingAlert) {
+            Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
         }
-        dismiss()
     }
 
-    // Function to handle user sign up
+    func logIn() {
+        sessionStore.signIn(email: email, password: password)
+            .sink(receiveCompletion: { completion in
+                if case .failure(let error) = completion {
+                    self.alertMessage = error.localizedDescription
+                    self.showingAlert = true
+                }
+            }, receiveValue: { success in
+                if success {
+                    self.presentationMode.wrappedValue.dismiss()
+                }
+            })
+            .store(in: &cancellables)
+    }
+
     func signUp() {
         guard password == verifyPassword else {
             self.alertMessage = "Passwords do not match."
@@ -102,19 +100,18 @@ struct AuthenticationView: View {
             return
         }
         
-        sessionStore.createAccount(email: email, password: password, name: name) { success, error in
-            if let error = error {
-                self.alertMessage = error.localizedDescription
-                self.showingAlert = true
-            } else if success {
-                // Navigate to SettingsView after successful sign-up
-                self.presentationMode.wrappedValue.dismiss()
-            } else {
-                self.alertMessage = "Failed to create account."
-                self.showingAlert = true
-            }
-        }
-        dismiss()
+        sessionStore.createAccount(email: email, password: password, name: name)
+            .sink(receiveCompletion: { completion in
+                if case .failure(let error) = completion {
+                    self.alertMessage = error.localizedDescription
+                    self.showingAlert = true
+                }
+            }, receiveValue: { success in
+                if success {
+                    self.presentationMode.wrappedValue.dismiss()
+                }
+            })
+            .store(in: &cancellables)
     }
 }
 

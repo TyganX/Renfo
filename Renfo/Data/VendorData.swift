@@ -1,6 +1,6 @@
 import Foundation
 
-// Define the properties of each festival
+// Define the properties of each vendor
 struct VendorData {
     var name: String
     var description: String
@@ -12,9 +12,10 @@ struct VendorData {
     var facebook: String
     var instagram: String
     var x: String
+    var festivalIDs: [String]
 }
 
-// Create instances of FestivalInfo for each festival
+// Create instances of VendorData for each vendor
 let trfDragonSlayer = VendorData(
     name: "TRF DragonSlayer",
     description: "Making History Fashionable",
@@ -23,7 +24,10 @@ let trfDragonSlayer = VendorData(
     email: "sales@trfdragonslayer.com",
     mapLink: "https://maps.apple.com/?q=TRF+DragonSlayer",
     websiteURL: "http://www.trfdragonslayer.com/",
-    facebook: "",
+    facebook: "TRFDragonSlayer",
     instagram: "",
-    x: ""
+    x: "",
+    festivalIDs: ["TRF", "SFF"]
 )
+
+// Add more vendors as needed

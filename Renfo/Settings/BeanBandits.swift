@@ -28,9 +28,9 @@ struct BeanBandits: View {
             Section {
                 URLButtonInApp(label: "Website", systemImage: "globe", urlString: "https://www.beanbandits.net/")
                 
-                URLButton(label: "Discord", systemImage: "person.bubble.fill", urlString: "discord://discord.gg/bE5tkVdAt9")
+                URLButton(label: "Discord", systemImage: "person.bubble", urlString: "discord://discord.gg/bE5tkVdAt9")
                 
-                URLButton(label: "Telegram", systemImage: "paperplane.fill", urlString: "https://t.me/BeanBandits")
+                URLButton(label: "Telegram", systemImage: "paperplane", urlString: "https://t.me/BeanBandits")
             }
         }
         .navigationTitle("Bean Bandits")

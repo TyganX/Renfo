@@ -23,7 +23,6 @@ struct FestivalView: View {
                                 Image(systemName: link.value.systemImage)
                                     .foregroundColor(nil)
                             }
-                            .padding(.vertical, 5)
                         }
                     }
                 }
@@ -46,9 +45,16 @@ struct FestivalView: View {
                 }
             }
         }
-        .navigationTitle(festival.established.isEmpty ? "" : "Est. \(festival.established)")
+        .navigationTitle(festival.id.isEmpty ? "" : "\(festival.id)")
+        //        .navigationTitle(festival.established.isEmpty ? "" : "Est. \(festival.established)")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarItems(trailing: activeIndicator)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text(festival.established.isEmpty ? "" : "Est. \(festival.established)")
+                //                    .fontWeight(.semibold)
+            }
+        }
     }
     
     // MARK: - Header Section
@@ -68,7 +74,7 @@ struct FestivalView: View {
                     Text(festival.name)
                         .font(.title3)
                         .fontWeight(.bold)
-                        .padding(.bottom)
+                        .padding(.bottom, 9)
                     
                     headerButtons
                 }
@@ -184,7 +190,7 @@ struct FestivalView: View {
         let formattedEndDate = convertStringToDate(dateString: festival.endDate)?.formattedDateString() ?? festival.endDate
         let formattedStartTime = convertTimeString(timeString: festival.startTime) ?? festival.startTime
         let formattedEndTime = convertTimeString(timeString: festival.endTime) ?? festival.endTime
-
+        
         let links: [(key: String, value: (systemImage: String, text: String))] = [
             ("dates", ("calendar", "\(formattedStartDate) - \(formattedEndDate)")),
             ("hours", ("clock", "\(formattedStartTime) - \(formattedEndTime)"))
@@ -192,13 +198,18 @@ struct FestivalView: View {
         return links.filter { !$0.value.text.isEmpty }
     }
     
-    // MARK: - Resource Section
+    // MARK: - Resources Section
     private var resourceLinks: [(key: String, value: (label: String, systemImage: String, view: () -> AnyView))] {
         let links: [(key: String, value: (label: String, systemImage: String, view: () -> AnyView))] = [
+            ("vendors", ("Vendors", "cart", {
+                AnyView(NavigationLink(destination: VendorListView(festivalID: festival.id)) {
+                    Label("Vendors", systemImage: "cart")
+                })
+            })),
             ("festivalMapImageName", ("Festival Map", "map.fill", {
                 if !festival.festivalMapImageName.isEmpty {
                     return AnyView(NavigationLink(destination: ImageView(imageName: festival.festivalMapImageName)) {
-                        Label("Festival Map", systemImage: "map.fill")
+                        Label("Festival Map", systemImage: "map")
                     })
                 } else {
                     return AnyView(EmptyView())
@@ -207,7 +218,7 @@ struct FestivalView: View {
             ("campgroundMapImageName", ("Campground Map", "map.circle.fill", {
                 if !festival.campgroundMapImageName.isEmpty {
                     return AnyView(NavigationLink(destination: ImageView(imageName: festival.campgroundMapImageName)) {
-                        Label("Campground Map", systemImage: "map.circle.fill")
+                        Label("Campground Map", systemImage: "map.circle")
                     })
                 } else {
                     return AnyView(EmptyView())
@@ -215,18 +226,18 @@ struct FestivalView: View {
             })),
             ("ticketsURL", ("Tickets", "ticket.fill", {
                 if !festival.ticketsURL.isEmpty {
-                    return AnyView(URLButtonInApp(label: "Tickets", systemImage: "ticket.fill", urlString: festival.ticketsURL))
+                    return AnyView(URLButtonInApp(label: "Tickets", systemImage: "ticket", urlString: festival.ticketsURL))
                 } else {
                     return AnyView(EmptyView())
                 }
             })),
             ("lostAndFoundURL", ("Lost & Found", "questionmark.app.fill", {
                 if !festival.lostAndFoundURL.isEmpty {
-                    return AnyView(URLButtonInApp(label: "Lost & Found", systemImage: "questionmark.app.fill", urlString: festival.lostAndFoundURL))
+                    return AnyView(URLButtonInApp(label: "Lost & Found", systemImage: "questionmark.app", urlString: festival.lostAndFoundURL))
                 } else {
                     return AnyView(EmptyView())
                 }
-            }))
+            })),
         ]
         return links.filter { !$0.value.0.isEmpty }
     }
@@ -237,7 +248,7 @@ struct FestivalView: View {
             "facebook": ("Facebook", "facebook", festival.facebook),
             "instagram": ("Instagram", "instagram", festival.instagram),
             "x": ("𝕏", "x", festival.x),
-            "youTube": ("YouTube", "youtube.fill", festival.youTube)
+            "youTube": ("YouTube", "youtube", festival.youTube)
         ]
         return socialLinks.filter { !$1.url.isEmpty }
     }
@@ -248,7 +259,7 @@ struct FestivalView: View {
         let endDate = convertStringToDate(dateString: festival.endDate)
         let currentDate = Date()
         let isCurrentDateWithinFestival = startDate != nil && endDate != nil && (startDate!...endDate!).contains(currentDate)
-
+        
         return HStack {
             Menu {
                 Button(action: {}) {

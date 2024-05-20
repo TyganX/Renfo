@@ -8,6 +8,8 @@
 import SwiftUI
 import Firebase
 import FirebaseAuth
+import FirebaseStorage
+import Combine
 
 // MARK: - Main Application Entry Point
 @main
@@ -121,12 +123,12 @@ enum AppColor: String, CaseIterable, Identifiable, Hashable {
 }
 
 // MARK: - Session Management
-// SessionStore class to manage user authentication state
 class SessionStore: ObservableObject {
     @Published var isUserSignedIn: Bool = false
     @Published var userName: String?
     @Published var userPhotoURL: String?
     var handle: AuthStateDidChangeListenerHandle?
+    var cancellables = Set<AnyCancellable>()
     
     init() {
         handle = Auth.auth().addStateDidChangeListener { [weak self] (auth, user) in
@@ -136,38 +138,42 @@ class SessionStore: ObservableObject {
         }
     }
     
-    // Computed property to get user initials from email
     var userInitials: String {
         guard let email = Auth.auth().currentUser?.email, let firstLetter = email.first else { return "N/A" }
         return String(firstLetter).uppercased()
     }
     
-    // Computed property to get the user's email
     var userEmail: String {
         Auth.auth().currentUser?.email ?? "Not available"
     }
     
-    // Create a new user account with email, password, and name
-    func createAccount(email: String, password: String, name: String, completion: @escaping (Bool, Error?) -> Void) {
-        Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
-            if let user = authResult?.user {
-                let changeRequest = user.createProfileChangeRequest()
+    func createAccount(email: String, password: String, name: String) -> AnyPublisher<Bool, Error> {
+        Auth.auth().createUserPublisher(withEmail: email, password: password)
+            .flatMap { authResult -> AnyPublisher<Void, Error> in
+                let changeRequest = authResult.user.createProfileChangeRequest()
                 changeRequest.displayName = name
-                changeRequest.commitChanges { error in
-                    if error == nil {
-                        self.userName = name
-                        completion(true, nil)
-                    } else {
-                        completion(false, error)
+                return Future { promise in
+                    changeRequest.commitChanges { error in
+                        if let error = error {
+                            promise(.failure(error))
+                        } else {
+                            self.userName = name
+                            promise(.success(()))
+                        }
                     }
                 }
-            } else {
-                completion(false, error)
+                .eraseToAnyPublisher()
             }
-        }
+            .map { _ in true }
+            .eraseToAnyPublisher()
     }
     
-    // Sign out the current user
+    func signIn(email: String, password: String) -> AnyPublisher<Bool, Error> {
+        Auth.auth().signInPublisher(withEmail: email, password: password)
+            .map { _ in true }
+            .eraseToAnyPublisher()
+    }
+    
     func signOut() {
         do {
             try Auth.auth().signOut()
@@ -177,50 +183,135 @@ class SessionStore: ObservableObject {
         }
     }
     
-    // Update the user's password
-    func updatePassword(newPassword: String, completion: @escaping (Bool, Error?) -> Void) {
-        Auth.auth().currentUser?.updatePassword(to: newPassword) { error in
-            if let error = error {
-                completion(false, error)
-            } else {
-                completion(true, nil)
+    func updatePassword(newPassword: String) -> AnyPublisher<Bool, Error> {
+        Future { promise in
+            Auth.auth().currentUser?.updatePassword(to: newPassword) { error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(true))
+                }
             }
         }
+        .eraseToAnyPublisher()
     }
-        
-        // Update the user's profile information
-    func updateProfile(name: String, email: String, password: String, profilePicture: UIImage?, completion: @escaping (Bool, Error?) -> Void) {
+    
+    func updateProfile(name: String?, email: String?, profilePicture: UIImage?) -> AnyPublisher<Bool, Error> {
         guard let user = Auth.auth().currentUser else {
-            completion(false, nil)
+            return Fail(error: NSError(domain: "No user", code: -1, userInfo: nil))
+                .eraseToAnyPublisher()
+        }
+        
+        var publishers = [AnyPublisher<Bool, Error>]()
+        
+        if let name = name {
+            let namePublisher = Future<Bool, Error> { promise in
+                let changeRequest = user.createProfileChangeRequest()
+                changeRequest.displayName = name
+                changeRequest.commitChanges { error in
+                    if let error = error {
+                        promise(.failure(error))
+                    } else {
+                        self.userName = name
+                        promise(.success(true))
+                    }
+                }
+            }.eraseToAnyPublisher()
+            publishers.append(namePublisher)
+        }
+        
+        if let email = email, email != user.email {
+            let emailPublisher = Future<Bool, Error> { promise in
+                user.sendEmailVerification(beforeUpdatingEmail: email) { error in
+                    if let error = error {
+                        promise(.failure(error))
+                    } else {
+                        promise(.success(true))
+                    }
+                }
+            }.eraseToAnyPublisher()
+            publishers.append(emailPublisher)
+        }
+        
+        if let profilePicture = profilePicture {
+            let profilePicturePublisher = Future<Bool, Error> { promise in
+                self.uploadProfilePicture(image: profilePicture) { result in
+                    switch result {
+                    case .success(let url):
+                        let changeRequest = user.createProfileChangeRequest()
+                        changeRequest.photoURL = url
+                        changeRequest.commitChanges { error in
+                            if let error = error {
+                                promise(.failure(error))
+                            } else {
+                                self.userPhotoURL = url.absoluteString
+                                promise(.success(true))
+                            }
+                        }
+                    case .failure(let error):
+                        promise(.failure(error))
+                    }
+                }
+            }.eraseToAnyPublisher()
+            publishers.append(profilePicturePublisher)
+        }
+        
+        return Publishers.MergeMany(publishers)
+            .collect()
+            .map { _ in true }
+            .eraseToAnyPublisher()
+    }
+    
+    private func uploadProfilePicture(image: UIImage, completion: @escaping (Result<URL, Error>) -> Void) {
+        guard let imageData = image.jpegData(compressionQuality: 0.8) else {
+            completion(.failure(NSError(domain: "Image conversion failed", code: -1, userInfo: nil)))
             return
         }
         
-        // Update the user's name and profile picture
-        let changeRequest = user.createProfileChangeRequest()
-        changeRequest.displayName = name
-        if let profilePicture = profilePicture {
-            // Upload the profilePicture to Firebase Storage and get the download URL
-        }
-        changeRequest.commitChanges { error in
+        let storageRef = Storage.storage().reference().child("profile_pictures/\(UUID().uuidString).jpg")
+        storageRef.putData(imageData, metadata: nil) { metadata, error in
             if let error = error {
-                completion(false, error)
+                completion(.failure(error))
             } else {
-                // Update the user's email and password
-                user.sendEmailVerification(beforeUpdatingEmail: email) { error in
+                storageRef.downloadURL { url, error in
                     if let error = error {
-                        completion(false, error)
-                    } else {
-                        user.updatePassword(to: password) { error in
-                            if let error = error {
-                                completion(false, error)
-                            } else {
-                                self.userName = name
-                                completion(true, nil)
-                            }
-                        }
+                        completion(.failure(error))
+                    } else if let url = url {
+                        completion(.success(url))
                     }
                 }
             }
         }
     }
 }
+
+
+
+extension Auth {
+    func createUserPublisher(withEmail email: String, password: String) -> AnyPublisher<AuthDataResult, Error> {
+        Future { promise in
+            self.createUser(withEmail: email, password: password) { authResult, error in
+                if let error = error {
+                    promise(.failure(error))
+                } else if let authResult = authResult {
+                    promise(.success(authResult))
+                }
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+    
+    func signInPublisher(withEmail email: String, password: String) -> AnyPublisher<AuthDataResult, Error> {
+        Future { promise in
+            self.signIn(withEmail: email, password: password) { authResult, error in
+                if let error = error {
+                    promise(.failure(error))
+                } else if let authResult = authResult {
+                    promise(.success(authResult))
+                }
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+}
+

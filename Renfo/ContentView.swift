@@ -7,7 +7,7 @@ struct ContentView: View {
     var body: some View {
         TabView() {
             // Home Tab
-            HomeView()
+            FestivalListView()
                 .tabItem {
                     Image(systemName: "house.fill")
                     Text("Home")

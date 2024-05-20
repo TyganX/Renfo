@@ -55,29 +55,29 @@ struct SettingsView: View {
                 
                 Section(header: Text("Appearance")) {
                     NavigationLink(value: AppTheme.system) {
-                        Label("App Theme", systemImage: "paintbrush.pointed.fill")
+                        Label("App Theme", systemImage: "paintbrush.pointed")
                     }
                     
                     NavigationLink(value: AppColorSelectionView(selectedColor: $appColor)) {
-                        Label("App Color", systemImage: "paintpalette.fill")
+                        Label("App Color", systemImage: "paintpalette")
                     }
                     
                     NavigationLink(value: AppIconSelectionView(selectedIcon: $selectedIcon)) {
-                        Label("App Icon", systemImage: "app.badge.fill")
+                        Label("App Icon", systemImage: "app")
                     }
                 }
                 
                 Section(header: Text("Other")) {
                     NavigationLink(destination: AboutView()) {
-                        Label("About", systemImage: "info.circle.fill")
+                        Label("About", systemImage: "info.circle")
                     }
                     
                     NavigationLink(destination: BeanBandits()) {
-                        Label("Bean Bandits", systemImage: "surfboard.fill")
+                        Label("Bean Bandits", systemImage: "surfboard")
                     }
                     
                     NavigationLink(destination: ComingSoonView()) {
-                        Label("Rate App", systemImage: "star.fill")
+                        Label("Rate App", systemImage: "star")
                     }
                     
                     Button(action: {
@@ -92,7 +92,7 @@ struct SettingsView: View {
                             Text("Share App")
                                 .foregroundColor(.primary)
                         } icon: {
-                            Image(systemName: "square.and.arrow.up.fill")
+                            Image(systemName: "square.and.arrow.up")
                         }
                     }
                 }
@@ -144,11 +144,11 @@ struct ThemeSelectionView: View {
     func iconForTheme(_ theme: AppTheme) -> String {
         switch theme {
         case .system:
-            return "gear" // Example icon for system theme
+            return "gear"
         case .light:
-            return "sun.max.fill" // Example icon for light theme
+            return "sun.max"
         case .dark:
-            return "moon.fill" // Example icon for dark theme
+            return "moon"
         }
     }
 }

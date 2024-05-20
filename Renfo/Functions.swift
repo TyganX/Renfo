@@ -150,7 +150,6 @@ extension Date {
     }
 }
 
-
 struct PulsingView: View {
     @State private var isAnimating = false
 
