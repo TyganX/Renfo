@@ -12,6 +12,22 @@ struct FestivalView: View {
             headerSection
                 .padding(.horizontal)
             Form {
+                if !detailsLinks.isEmpty {
+                    Section(header: Text("Details")) {
+                        ForEach(detailsLinks, id: \.key) { link in
+                            Label {
+                                Text(link.value.text)
+                                    .font(.body)
+                                    .foregroundColor(.primary)
+                            } icon: {
+                                Image(systemName: link.value.systemImage)
+                                    .foregroundColor(nil)
+                            }
+                            .padding(.vertical, 5)
+                        }
+                    }
+                }
+                
                 if !resourceLinks.isEmpty {
                     Section(header: Text("Resources")) {
                         ForEach(resourceLinks, id: \.key) { link in
@@ -88,8 +104,8 @@ struct FestivalView: View {
                 Image(systemName: "phone.fill")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 22, height: 20)
-                Text("call")
+                    .frame(width: 19, height: 20)
+                Text("Call")
                     .font(.caption)
             }
             .frame(width: 54, height: 44)
@@ -110,8 +126,8 @@ struct FestivalView: View {
                 Image(systemName: "envelope.fill")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 22, height: 20)
-                Text("mail")
+                    .frame(width: 19, height: 20)
+                Text("Mail")
                     .font(.caption)
             }
             .frame(width: 54, height: 44)
@@ -131,8 +147,8 @@ struct FestivalView: View {
                 Image(systemName: "location.fill")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 22, height: 20)
-                Text("maps")
+                    .frame(width: 19, height: 20)
+                Text("Maps")
                     .font(.caption)
             }
             .frame(width: 54, height: 44)
@@ -149,11 +165,11 @@ struct FestivalView: View {
             }
         }) {
             VStack {
-                Image(systemName: "globe")
+                Image(systemName: "safari.fill")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 22, height: 20)
-                Text("website")
+                    .frame(width: 19, height: 20)
+                Text("Website")
                     .font(.caption)
             }
             .frame(width: 54, height: 44)
@@ -162,7 +178,21 @@ struct FestivalView: View {
         .buttonStyle(.bordered)
     }
     
-    // MARK: - Resource Links
+    // MARK: - Details Section
+    private var detailsLinks: [(key: String, value: (systemImage: String, text: String))] {
+        let formattedStartDate = convertStringToDate(dateString: festival.startDate)?.formattedDateString() ?? festival.startDate
+        let formattedEndDate = convertStringToDate(dateString: festival.endDate)?.formattedDateString() ?? festival.endDate
+        let formattedStartTime = convertTimeString(timeString: festival.startTime) ?? festival.startTime
+        let formattedEndTime = convertTimeString(timeString: festival.endTime) ?? festival.endTime
+
+        let links: [(key: String, value: (systemImage: String, text: String))] = [
+            ("dates", ("calendar", "\(formattedStartDate) - \(formattedEndDate)")),
+            ("hours", ("clock", "\(formattedStartTime) - \(formattedEndTime)"))
+        ]
+        return links.filter { !$0.value.text.isEmpty }
+    }
+    
+    // MARK: - Resource Section
     private var resourceLinks: [(key: String, value: (label: String, systemImage: String, view: () -> AnyView))] {
         let links: [(key: String, value: (label: String, systemImage: String, view: () -> AnyView))] = [
             ("festivalMapImageName", ("Festival Map", "map.fill", {
@@ -201,7 +231,7 @@ struct FestivalView: View {
         return links.filter { !$0.value.0.isEmpty }
     }
     
-    // MARK: - Social Links
+    // MARK: - Social Section
     private var socialLinks: [String: (label: String, systemImage: String, url: String)] {
         let socialLinks: [String: (label: String, systemImage: String, url: String)] = [
             "facebook": ("Facebook", "facebook", festival.facebook),

@@ -134,6 +134,23 @@ func convertStringToDate(dateString: String) -> Date? {
     return dateFormatter.date(from: dateString)
 }
 
+func convertTimeString(timeString: String) -> String? {
+    let timeFormatter = DateFormatter()
+    timeFormatter.dateFormat = "HHmm"
+    guard let date = timeFormatter.date(from: timeString) else { return nil }
+    timeFormatter.dateFormat = "h:mm a"
+    return timeFormatter.string(from: date)
+}
+
+extension Date {
+    func formattedDateString() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM dd, yyyy" // Change to abbreviated month format
+        return formatter.string(from: self)
+    }
+}
+
+
 struct PulsingView: View {
     @State private var isAnimating = false
 
