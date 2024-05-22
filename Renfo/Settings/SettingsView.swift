@@ -11,107 +11,105 @@ struct SettingsView: View {
     
     
     var body: some View {
-        NavigationStack {
-            Form {
-                // Profile Header Section
-                Section {
-                    if sessionStore.isUserSignedIn {
-                        NavigationLink(destination: AccountView()) {
-                            HStack(spacing: 15) {
-                                Image(systemName: "person.crop.circle.fill")
-                                    .resizable()
-                                    .frame(width: 60, height: 60)
-                                    .clipShape(Circle())
-                                    .foregroundColor(.gray)
-                                VStack(alignment: .leading) {
-                                    if let userName = sessionStore.userName { // Display the user's name if available
-                                        Text(userName) // Now a computed property in SessionStore
-                                            .font(.headline)
-                                    }
-                                    Text(sessionStore.userEmail) // Ensure this is a computed property in SessionStore
-                                        .font(.subheadline)
-                                        .foregroundColor(.gray)
-                                }
-                            }
-                        }
-                    } else {
-                        NavigationLink(destination: AuthenticationView()) {
-                            HStack(spacing: 15) {
-                                Image(systemName: "person.crop.circle.fill") // Directly use the system image
-                                    .resizable() // Make the image resizable
-                                    .scaledToFit() // Scale the image to fit
-                                    .frame(width: 60, height: 60) // Set the frame for the image
-                                    .foregroundColor(.gray) // Set the color for the image
-                                VStack(alignment: .leading) {
-                                    Text("Guest")
+        Form {
+            // Profile Header Section
+            Section {
+                if sessionStore.isUserSignedIn {
+                    NavigationLink(destination: AccountView()) {
+                        HStack(spacing: 15) {
+                            Image(systemName: "person.crop.circle.fill")
+                                .resizable()
+                                .frame(width: 60, height: 60)
+                                .clipShape(Circle())
+                                .foregroundColor(.gray)
+                            VStack(alignment: .leading) {
+                                if let userName = sessionStore.userName { // Display the user's name if available
+                                    Text(userName) // Now a computed property in SessionStore
                                         .font(.headline)
-                                    Text("Sign in")
-                                        .foregroundColor(.blue)
                                 }
+                                Text(sessionStore.userEmail) // Ensure this is a computed property in SessionStore
+                                    .font(.subheadline)
+                                    .foregroundColor(.gray)
+                            }
+                        }
+                    }
+                } else {
+                    NavigationLink(destination: AuthenticationView()) {
+                        HStack(spacing: 15) {
+                            Image(systemName: "person.crop.circle.fill") // Directly use the system image
+                                .resizable() // Make the image resizable
+                                .scaledToFit() // Scale the image to fit
+                                .frame(width: 60, height: 60) // Set the frame for the image
+                                .foregroundColor(.gray) // Set the color for the image
+                            VStack(alignment: .leading) {
+                                Text("Guest")
+                                    .font(.headline)
+                                Text("Sign in")
+                                    .foregroundColor(.blue)
                             }
                         }
                     }
                 }
-                
-                Section(header: Text("Appearance")) {
-                    NavigationLink(value: AppTheme.system) {
-                        Label("App Theme", systemImage: "paintbrush.pointed")
-                    }
-                    
-                    NavigationLink(value: AppColorSelectionView(selectedColor: $appColor)) {
-                        Label("App Color", systemImage: "paintpalette")
-                    }
-                    
-                    NavigationLink(value: AppIconSelectionView(selectedIcon: $selectedIcon)) {
-                        Label("App Icon", systemImage: "app")
-                    }
-                }
-                
-                Section(header: Text("Other")) {
-                    NavigationLink(destination: AboutView()) {
-                        Label("About", systemImage: "info.circle")
-                    }
-                    
-                    NavigationLink(destination: BeanBandits()) {
-                        Label("Bean Bandits", systemImage: "surfboard")
-                    }
-                    
-                    NavigationLink(destination: ComingSoonView()) {
-                        Label("Rate App", systemImage: "star")
-                    }
-                    
-                    Button(action: {
-                        let url = URL(string: "https://testflight.apple.com/join/WnvOF5Jg") // Replace with your app store link
-                        let activityVC = UIActivityViewController(activityItems: [url!], applicationActivities: nil)
-                        
-                        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
-                            windowScene.windows.first?.rootViewController?.present(activityVC, animated: true, completion: nil)
-                        }
-                    }) {
-                        Label {
-                            Text("Share App")
-                                .foregroundColor(.primary)
-                        } icon: {
-                            Image(systemName: "square.and.arrow.up")
-                        }
-                    }
-                }
-            }
-            .navigationTitle("Settings")
-            
-            // Define the navigation destination for ThemeSelectionView
-            .navigationDestination(for: AppTheme.self) { theme in
-                ThemeSelectionView(selectedTheme: $appTheme)
             }
             
-            // Define the navigation destination for AppColorSelectionView
-            .navigationDestination(for: AppColorSelectionView.self) { appColorSelectionView in
-                appColorSelectionView
+            Section(header: Text("Appearance")) {
+                NavigationLink(value: AppTheme.system) {
+                    Label("App Theme", systemImage: "paintbrush.pointed")
+                }
+                
+                NavigationLink(value: AppColorSelectionView(selectedColor: $appColor)) {
+                    Label("App Color", systemImage: "paintpalette")
+                }
+                
+                NavigationLink(value: AppIconSelectionView(selectedIcon: $selectedIcon)) {
+                    Label("App Icon", systemImage: "app")
+                }
             }
-            // Define the navigation destination for AppIconSelectionView
-            .navigationDestination(for: AppIconSelectionView.self) { appIconSelectionView in
-                appIconSelectionView
+            
+            Section(header: Text("Other")) {
+                NavigationLink(destination: AboutView()) {
+                    Label("About", systemImage: "info.circle")
+                }
+                
+                NavigationLink(destination: BeanBandits()) {
+                    Label("Bean Bandits", systemImage: "surfboard")
+                }
+                
+                NavigationLink(destination: ComingSoonView()) {
+                    Label("Rate App", systemImage: "star")
+                }
+                
+                Button(action: {
+                    let url = URL(string: "https://testflight.apple.com/join/WnvOF5Jg") // Replace with your app store link
+                    let activityVC = UIActivityViewController(activityItems: [url!], applicationActivities: nil)
+                    
+                    if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                        windowScene.windows.first?.rootViewController?.present(activityVC, animated: true, completion: nil)
+                    }
+                }) {
+                    Label {
+                        Text("Share App")
+                            .foregroundColor(.primary)
+                    } icon: {
+                        Image(systemName: "square.and.arrow.up")
+                    }
+                }
             }
+        }
+        .navigationTitle("Settings")
+        
+        // Define the navigation destination for ThemeSelectionView
+        .navigationDestination(for: AppTheme.self) { theme in
+            ThemeSelectionView(selectedTheme: $appTheme)
+        }
+        
+        // Define the navigation destination for AppColorSelectionView
+        .navigationDestination(for: AppColorSelectionView.self) { appColorSelectionView in
+            appColorSelectionView
+        }
+        // Define the navigation destination for AppIconSelectionView
+        .navigationDestination(for: AppIconSelectionView.self) { appIconSelectionView in
+            appIconSelectionView
         }
     }
 }
@@ -256,7 +254,9 @@ struct ComingSoonView: View {
 // Preview provider
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
-        SettingsView()
-            .environmentObject(SessionStore())
+        NavigationStack {
+            SettingsView()
+                .environmentObject(SessionStore())
+        }
     }
 }

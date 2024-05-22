@@ -27,6 +27,11 @@ struct RenfoApp: App {
     init() {
         // Firebase configuration
         FirebaseApp.configure()
+        
+        // Enable Firestore offline persistence
+        let settings = Firestore.firestore().settings
+        settings.cacheSettings = PersistentCacheSettings()
+        Firestore.firestore().settings = settings
     }
     
     // MARK: - Scene Builder
@@ -285,8 +290,6 @@ class SessionStore: ObservableObject {
     }
 }
 
-
-
 extension Auth {
     func createUserPublisher(withEmail email: String, password: String) -> AnyPublisher<AuthDataResult, Error> {
         Future { promise in
@@ -314,4 +317,3 @@ extension Auth {
         .eraseToAnyPublisher()
     }
 }
-

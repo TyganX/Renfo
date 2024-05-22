@@ -140,26 +140,25 @@ struct CalendarView: View {
     let groupedEvents = groupEventsByDay(events: eventData)
 
     var body: some View {
-        NavigationStack {
-            VStack {
-                // Top half for the month view
-                MonthView(events: eventData)
-//                    .frame(maxHeight: .infinity) // This will take half the space available
-                
-                // Bottom half for the scrollable list of events
-                EventsView(groupedEvents: groupedEvents)
-                    .frame(maxHeight: .infinity) // This will take the remaining space
-            }
-            // Move the month name to the navigation title
-            .navigationTitle(MonthView(events: eventData).currentMonth)
+        VStack {
+            // Top half for the month view
+            MonthView(events: eventData)
+            //                    .frame(maxHeight: .infinity) // This will take half the space available
             
+            // Bottom half for the scrollable list of events
+            EventsView(groupedEvents: groupedEvents)
+                .frame(maxHeight: .infinity) // This will take the remaining space
         }
+        // Move the month name to the navigation title
+        .navigationTitle(MonthView(events: eventData).currentMonth)
     }
 }
 
 // Preview
 struct CalendarView_Previews: PreviewProvider {
     static var previews: some View {
-        CalendarView()
+        NavigationStack {
+            CalendarView()
+        }
     }
 }

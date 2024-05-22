@@ -17,7 +17,7 @@ struct AboutView: View {
 // MARK: - Preview Provider
 struct AboutView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationView {
+        NavigationStack {
             AboutView()
         }
     }

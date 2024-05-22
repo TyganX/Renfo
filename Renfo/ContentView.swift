@@ -7,25 +7,40 @@ struct ContentView: View {
     var body: some View {
         TabView() {
             // Home Tab
-            FestivalListView()
-                .tabItem {
-                    Image(systemName: "house.fill")
-                    Text("Home")
-                }
+            NavigationStack {
+                FestivalListView()
+            }
+            .tabItem {
+                Image(systemName: "building.columns")
+                Text("Festivals")
+            }
         
+            // Vendors Tab
+            NavigationStack {
+                VendorListView()
+            }
+            .tabItem {
+                Image(systemName: "person.2")
+                Text("Vendors")
+            }
+            
             // Calendar Tab
-            CalendarView()
-                .tabItem {
-                    Image(systemName: "calendar")
-                    Text("Calendar")
-                }
+            NavigationStack {
+                CalendarView()
+            }
+            .tabItem {
+                Image(systemName: "calendar")
+                Text("Calendar")
+            }
 
             // Settings Tab
-            SettingsView()
-                .tabItem {
-                    Image(systemName: "gearshape.fill")
-                    Text("Settings")
-                }
+            NavigationStack {
+                SettingsView()
+            }
+            .tabItem {
+                Image(systemName: "gearshape.fill")
+                Text("Settings")
+            }
         }
         .accentColor(appColor.color) // Apply the accent color to the TabView
     }

@@ -40,7 +40,7 @@ struct BeanBandits: View {
 
 struct BeanBandits_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationView {
+        NavigationStack {
             BeanBandits()
         }
     }
