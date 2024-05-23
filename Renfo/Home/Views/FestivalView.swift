@@ -263,19 +263,28 @@ struct FestivalView: View {
 
     // MARK: - Active Indicator
     private var activeIndicator: some View {
-        let startDate = convertStringToDate(dateString: festival.dateStart)
-        let endDate = convertStringToDate(dateString: festival.dateEnd)
+        let startDate = convertStringToDate(dateString: festival.dateStart) ?? Date.distantFuture
+        let endDate = convertStringToDate(dateString: festival.dateEnd) ?? Date.distantPast
         let currentDate = Date()
-        let isCurrentDateWithinFestival = startDate != nil && endDate != nil && (startDate!...endDate!).contains(currentDate)
+
+        let indicatorText: String
+        if currentDate >= startDate && currentDate <= endDate {
+            indicatorText = "Currently Active!"
+        } else if currentDate < startDate {
+            let daysUntilStart = Calendar.current.dateComponents([.day], from: currentDate, to: startDate).day ?? 0
+            indicatorText = "\(daysUntilStart) Days Until Huzzah!"
+        } else {
+            indicatorText = "TBA"
+        }
 
         return AnyView(HStack {
             Menu {
                 Button(action: {}) {
-                    Label("\(festival.dateStart)-\(festival.dateEnd)", systemImage: "calendar.badge.checkmark")
+                    Label(indicatorText, systemImage: "calendar.badge.checkmark")
                 }
             } label: {
                 PulsingView()
-                    .foregroundColor(isCurrentDateWithinFestival ? .green : .red)
+                    .foregroundColor(currentDate >= startDate && currentDate <= endDate ? .green : .red)
                     .frame(width: 10, height: 10)
             }
         })
@@ -317,7 +326,3 @@ struct FestivalView_Previews: PreviewProvider {
         }
     }
 }
-
-
-
-
