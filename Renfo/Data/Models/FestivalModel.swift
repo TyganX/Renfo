@@ -1,5 +1,6 @@
 import Foundation
 import FirebaseFirestoreSwift
+import FirebaseFirestore
 
 struct FestivalModel: Codable, Identifiable {
     @DocumentID var id: String?
@@ -27,8 +28,8 @@ struct FestivalModel: Codable, Identifiable {
     var website: String = ""
     var xHandle: String = ""
     var youTubeChannel: String = ""
+    var coordinates: GeoPoint? = nil // Use GeoPoint for coordinates
 
-    // Custom decoding to handle missing fields
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.id = try container.decodeIfPresent(String.self, forKey: .id) ?? nil
@@ -56,7 +57,41 @@ struct FestivalModel: Codable, Identifiable {
         self.website = try container.decodeIfPresent(String.self, forKey: .website) ?? ""
         self.xHandle = try container.decodeIfPresent(String.self, forKey: .xHandle) ?? ""
         self.youTubeChannel = try container.decodeIfPresent(String.self, forKey: .youTubeChannel) ?? ""
+        self.coordinates = try container.decodeIfPresent(GeoPoint.self, forKey: .coordinates) ?? nil
     }
 
     init() {}
+}
+
+// Extension to provide a sample instance of FestivalModel for use in SwiftUI previews and testing.
+extension FestivalModel {
+    static var sample: FestivalModel {
+        var festival = FestivalModel()
+        festival.id = "trf"
+        festival.address = "21778 FM 1774"
+        festival.campgroundMapImage = "TRFCampgroundMap"
+        festival.city = "Todd Mission"
+        festival.contactEmail = "info@texrenfest.com"
+        festival.contactPhone = "1234567890"
+        festival.dateEnd = "12/17/2024"
+        festival.dateStart = "10/10/2024"
+        festival.established = "1974"
+        festival.facebookPage = "texrenfest"
+        festival.festivalDescription = "The Texas Renaissance Festival is an annual Renaissance fair located in Todd Mission, Texas."
+        festival.festivalMapImage = "TRFFestivalMap"
+        festival.instagramHandle = "texrenfest"
+        festival.locationMapLink = "https://maps.google.com"
+        festival.logoImage = "TRFLogo"
+        festival.lostAndFound = "https://www.texrenfest.com/lost-and-found"
+        festival.name = "Texas Renaissance Festival"
+        festival.postalCode = "77363"
+        festival.state = "Texas"
+        festival.tickets = "https://www.texrenfest.com/tickets"
+        festival.timeEnd = "2000"
+        festival.timeStart = "0900"
+        festival.website = "https://www.texrenfest.com"
+        festival.xHandle = "texrenfest"
+        festival.youTubeChannel = "texrenfest"
+        return festival
+    }
 }

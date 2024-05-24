@@ -16,35 +16,24 @@ struct FestivalListView: View {
                     .progressViewStyle(CircularProgressViewStyle())
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                List {
-                    ForEach(viewModel.sortedFestivals.keys.sorted(), id: \.self) { key in
-                        Section(header: Text(key)) {
-                            ForEach(viewModel.sortedFestivals[key] ?? []) { festival in
-                                NavigationLink(destination: FestivalView(festival: festival)) {
-                                    FestivalRow(festival: festival)
-                                }
-                            }
+                festivalList
+                    .navigationTitle("Festivals")
+                    .searchable(text: $viewModel.searchText, prompt: "Search")
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            sortMenu
                         }
                     }
-                    addFestivalFooter
-                }
-                .navigationTitle("Festivals")
-                .searchable(text: $viewModel.searchText, prompt: "Search")
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        sortMenu
+                    .sheet(isPresented: $isShowingMailView) {
+                        MailView(isShowing: $isShowingMailView, result: $mailResult)
                     }
-                }
-                .sheet(isPresented: $isShowingMailView) {
-                    MailView(isShowing: $isShowingMailView, result: $mailResult)
-                }
-                .alert(isPresented: $showAlert) {
-                    Alert(
-                        title: Text("Cannot Send Mail"),
-                        message: Text("Your device is not configured to send mail. Please configure a mail account in the Mail app or contact support."),
-                        dismissButton: .default(Text("OK"))
-                    )
-                }
+                    .alert(isPresented: $showAlert) {
+                        Alert(
+                            title: Text("Cannot Send Mail"),
+                            message: Text("Your device is not configured to send mail. Please configure a mail account in the Mail app or contact support."),
+                            dismissButton: .default(Text("OK"))
+                        )
+                    }
             }
         }
         .onAppear {
@@ -53,6 +42,21 @@ struct FestivalListView: View {
     }
 
     // MARK: - View Components
+    private var festivalList: some View {
+        List {
+            ForEach(viewModel.sortedFestivals.keys.sorted(), id: \.self) { key in
+                Section(header: Text(key)) {
+                    ForEach(viewModel.sortedFestivals[key] ?? []) { festival in
+                        NavigationLink(destination: FestivalView(viewModel: FestivalViewModel(festival: festival))) {
+                            FestivalRow(festival: festival)
+                        }
+                    }
+                }
+            }
+            addFestivalFooter
+        }
+    }
+
     private var sortMenu: some View {
         Menu {
             Text("Sort")
@@ -65,7 +69,6 @@ struct FestivalListView: View {
             Image(systemName: "ellipsis.circle")
         }
     }
-
 
     private var addFestivalFooter: some View {
         HStack {

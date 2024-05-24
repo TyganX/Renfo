@@ -14,23 +14,14 @@ struct ContentView: View {
                 Image(systemName: "building.columns")
                 Text("Festivals")
             }
-        
-            // Vendors Tab
-            NavigationStack {
-                VendorListView()
-            }
-            .tabItem {
-                Image(systemName: "person.2")
-                Text("Vendors")
-            }
             
-            // Calendar Tab
+            // Map Tab
             NavigationStack {
-                CalendarView()
+                MapView()
             }
             .tabItem {
-                Image(systemName: "calendar")
-                Text("Calendar")
+                Image(systemName: "map")
+                Text("Map")
             }
 
             // Settings Tab
