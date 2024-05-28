@@ -3,7 +3,7 @@ import MessageUI
 
 // MARK: - Home View
 struct FestivalListView: View {
-    @StateObject private var viewModel = FestivalListViewModel()
+    @EnvironmentObject var viewModel: FestivalListViewModel
     @State private var isShowingMailView = false
     @State private var mailResult: Result<MFMailComposeResult, Error>? = nil
     @State private var showAlert = false
@@ -47,7 +47,7 @@ struct FestivalListView: View {
             ForEach(viewModel.sortedFestivals.keys.sorted(), id: \.self) { key in
                 Section(header: Text(key)) {
                     ForEach(viewModel.sortedFestivals[key] ?? []) { festival in
-                        NavigationLink(destination: FestivalView(viewModel: FestivalViewModel(festival: festival))) {
+                        NavigationLink(destination: FestivalView(viewModel: FestivalViewModel(festival: festival, listViewModel: viewModel))) {
                             FestivalRow(festival: festival)
                         }
                     }
@@ -64,6 +64,7 @@ struct FestivalListView: View {
                 Label("Name", systemImage: "textformat").tag(SortOption.name)
                 Label("State", systemImage: "map").tag(SortOption.state)
                 Label("Active", systemImage: "calendar").tag(SortOption.active)
+                Label("Favorite", systemImage: "star").tag(SortOption.favorite)
             }
         } label: {
             Image(systemName: "ellipsis.circle")
@@ -114,6 +115,7 @@ struct FestivalListView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationStack {
             FestivalListView()
+                .environmentObject(FestivalListViewModel())
         }
     }
 }

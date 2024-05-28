@@ -1,4 +1,3 @@
-import Foundation
 import SwiftUI
 
 // MARK: - Festival View
@@ -46,12 +45,22 @@ struct FestivalView: View {
             }
             .navigationTitle(viewModel.festival.id?.isEmpty == false ? "\(viewModel.festival.id!)" : "")
             .navigationBarTitleDisplayMode(.inline)
-            .navigationBarItems(trailing: activeIndicator)
+            .navigationBarItems(trailing: favoriteButton)
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text(viewModel.festival.established.isEmpty ? "" : "Est. \(viewModel.festival.established)")
                 }
             }
+        }
+    }
+
+    // MARK: - Favorite Button
+    private var favoriteButton: some View {
+        Button(action: {
+            viewModel.toggleFavorite()
+        }) {
+            Image(systemName: viewModel.isFavorite ? "star.fill" : "star")
+                .foregroundColor(viewModel.isFavorite ? .yellow : .gray)
         }
     }
 
@@ -161,21 +170,6 @@ struct FestivalView: View {
             )
         ]
     }
-
-    // MARK: - Active Indicator
-    private var activeIndicator: some View {
-        AnyView(HStack {
-            Menu {
-                Button(action: {}) {
-                    Label(viewModel.activeIndicatorText, systemImage: "calendar.badge.checkmark")
-                }
-            } label: {
-                PulsingView()
-                    .foregroundColor(viewModel.activeIndicatorText == "Currently Active!" ? .green : .red)
-                    .frame(width: 10, height: 10)
-            }
-        })
-    }
 }
 
 // MARK: - Button Config Struct
@@ -190,7 +184,7 @@ struct ButtonConfig {
 struct FestivalView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationStack {
-            FestivalView(viewModel: FestivalViewModel(festival: .sample))
+            FestivalView(viewModel: FestivalViewModel(festival: .sample, listViewModel: FestivalListViewModel()))
         }
     }
 }

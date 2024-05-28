@@ -1,89 +1,12 @@
 import SwiftUI
 import MapKit
 import FirebaseFirestore
-import FirebaseFirestoreSwift
 
-struct MapViewRepresentable: UIViewRepresentable {
-    @StateObject private var viewModel = MapAnnotationsViewModel()
-    @Binding var selectedFestival: FestivalModel?
-    @Binding var showingFestivalView: Bool
-
-    class Coordinator: NSObject, MKMapViewDelegate {
-        var parent: MapViewRepresentable
-
-        init(parent: MapViewRepresentable) {
-            self.parent = parent
-        }
-
-        func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-            let identifier = "FestivalAnnotation"
-            var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier) as? MKMarkerAnnotationView
-            if annotationView == nil {
-                annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: identifier)
-                annotationView?.canShowCallout = true
-            } else {
-                annotationView?.annotation = annotation
-            }
-            return annotationView
-        }
-
-        func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
-            guard let annotation = view.annotation as? MKPointAnnotation,
-                  let festival = parent.viewModel.festivals.first(where: { $0.coordinates?.latitude == annotation.coordinate.latitude && $0.coordinates?.longitude == annotation.coordinate.longitude }) else {
-                return
-            }
-            parent.selectedFestival = festival
-            parent.showingFestivalView = true
-        }
-    }
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(parent: self)
-    }
-
-    func makeUIView(context: Context) -> MKMapView {
-        let mapView = MKMapView()
-        mapView.delegate = context.coordinator
-        mapView.showsUserLocation = true
-        mapView.isZoomEnabled = true
-        mapView.isScrollEnabled = true
-        return mapView
-    }
-
-    func updateUIView(_ uiView: MKMapView, context: Context) {
-        uiView.removeAnnotations(uiView.annotations)
-        uiView.addAnnotations(viewModel.annotations)
-
-        if !viewModel.annotations.isEmpty {
-            let coordinates = viewModel.annotations.map { $0.coordinate }
-            let region = MKCoordinateRegion(coordinates: coordinates)
-            uiView.setRegion(region, animated: true)
-        }
-    }
-}
-
-extension MKCoordinateRegion {
-    init(coordinates: [CLLocationCoordinate2D]) {
-        let minLat = coordinates.map { $0.latitude }.min() ?? 0.0
-        let maxLat = coordinates.map { $0.latitude }.max() ?? 0.0
-        let minLon = coordinates.map { $0.longitude }.min() ?? 0.0
-        let maxLon = coordinates.map { $0.longitude }.max() ?? 0.0
-
-        let center = CLLocationCoordinate2D(
-            latitude: (minLat + maxLat) / 2,
-            longitude: (minLon + maxLon) / 2
-        )
-        let span = MKCoordinateSpan(
-            latitudeDelta: (maxLat - minLat) * 1.2,
-            longitudeDelta: (maxLon - minLon) * 1.2
-        )
-        self.init(center: center, span: span)
-    }
-}
-
-class MapAnnotationsViewModel: ObservableObject {
+class MapViewModel: ObservableObject {
     @Published var annotations: [MKPointAnnotation] = []
     @Published var festivals: [FestivalModel] = []
+    @Published var selectedFestival: FestivalModel?
+    @Published var showingFestivalView: Bool = false
     private let firestoreService = FirestoreService()
 
     init() {
@@ -106,5 +29,28 @@ class MapAnnotationsViewModel: ObservableObject {
                 self.festivals = fetchedFestivals
             }
         }
+    }
+
+    func selectFestival(annotation: MKPointAnnotation) {
+        guard let festival = festivals.first(where: { $0.coordinates?.latitude == annotation.coordinate.latitude && $0.coordinates?.longitude == annotation.coordinate.longitude }) else {
+            return
+        }
+        selectedFestival = festival
+        showingFestivalView = true
+    }
+
+    func isFestivalActive(_ festival: FestivalModel) -> Bool {
+        let now = Date()
+        guard let startDate = convertStringToDate(dateString: festival.dateStart),
+              let endDate = convertStringToDate(dateString: festival.dateEnd) else {
+            return false
+        }
+        return startDate <= now && now <= endDate
+    }
+
+    private func convertStringToDate(dateString: String) -> Date? {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy" // Update this format to match your actual date format
+        return dateFormatter.date(from: dateString)
     }
 }

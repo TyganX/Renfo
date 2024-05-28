@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import Combine
 
 class FestivalListViewModel: ObservableObject {
     @Published var festivals: [FestivalModel] = []
@@ -51,11 +52,39 @@ class FestivalListViewModel: ObservableObject {
             return groupedByState.mapValues { $0.sorted(by: { $0.name < $1.name }) }
         case .active:
             let now = Date()
-            let activeFestivals = filteredFestivals.filter { $0.isActive }.sorted(by: { convertStringToDate(dateString: $0.dateStart) ?? Date.distantFuture < convertStringToDate(dateString: $1.dateStart) ?? Date.distantFuture })
-            let upcomingFestivals = filteredFestivals.filter { convertStringToDate(dateString: $0.dateStart) ?? Date.distantFuture > now }.sorted(by: { convertStringToDate(dateString: $0.dateStart) ?? Date.distantFuture < convertStringToDate(dateString: $1.dateStart) ?? Date.distantFuture })
-            let tbaFestivals = filteredFestivals.filter { convertStringToDate(dateString: $0.dateEnd) ?? Date.distantPast < now && !$0.isActive }.sorted(by: { convertStringToDate(dateString: $0.dateEnd) ?? Date.distantPast > convertStringToDate(dateString: $1.dateEnd) ?? Date.distantPast })
-            return ["Active": activeFestivals, "Inactive": upcomingFestivals, "TBA": tbaFestivals]
+            let activeFestivals = filteredFestivals.filter { $0.isActive }.sorted(by: { $0.name < $1.name })
+            let upcomingFestivals = filteredFestivals.filter { !($0.isActive) && ($0.dateStart.toDate(format: "MM/dd/yyyy") ?? Date.distantFuture) > now }.sorted(by: { $0.name < $1.name })
+            let tbaFestivals = filteredFestivals.filter { !($0.isActive) && ($0.dateEnd.toDate(format: "MM/dd/yyyy") ?? Date.distantPast) < now }.sorted(by: { $0.name < $1.name })
+            
+            var activeSections: [String: [FestivalModel]] = [:]
+            if !activeFestivals.isEmpty {
+                activeSections[" Active"] = activeFestivals
+            }
+            if !upcomingFestivals.isEmpty {
+                activeSections[" Upcoming"] = upcomingFestivals
+            }
+            if !tbaFestivals.isEmpty {
+                activeSections["TBA"] = tbaFestivals
+            }
+            return activeSections
+        case .favorite:
+            let favorites = UserDefaults.standard.stringArray(forKey: "favoriteFestivals") ?? []
+            let favoriteFestivals = filteredFestivals.filter { favorites.contains($0.id ?? "") }.sorted(by: { $0.name < $1.name })
+            let nonFavoriteFestivals = filteredFestivals.filter { !favorites.contains($0.id ?? "") }.sorted(by: { $0.name < $1.name })
+            
+            var favoriteSections: [String: [FestivalModel]] = [:]
+            if !favoriteFestivals.isEmpty {
+                favoriteSections["Favorites"] = favoriteFestivals
+            }
+            if !nonFavoriteFestivals.isEmpty {
+                favoriteSections["Others"] = nonFavoriteFestivals
+            }
+            return favoriteSections
         }
+    }
+
+    func refreshFavoriteSort() {
+        objectWillChange.send()
     }
 }
 
@@ -67,6 +96,7 @@ enum SortOption: Int, Identifiable {
     case name
     case state
     case active
+    case favorite
 
     var id: Int { self.rawValue }
 }

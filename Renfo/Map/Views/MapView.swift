@@ -1,22 +1,18 @@
 import SwiftUI
 
 struct MapView: View {
-    @State private var selectedFestival: FestivalModel?
-    @State private var showingFestivalView = false
+    @StateObject private var viewModel = MapViewModel()
 
     var body: some View {
-        MapViewRepresentable(selectedFestival: $selectedFestival, showingFestivalView: $showingFestivalView)
+        MapViewRepresentable(viewModel: viewModel)
             .edgesIgnoringSafeArea(.top)
-            .sheet(isPresented: $showingFestivalView) {
-                if let selectedFestival = selectedFestival {
-                    FestivalView(viewModel: FestivalViewModel(festival: selectedFestival))
-                        .presentationDetents([
-                            .medium,
-                            .large
-//                            .height(250),
-//                            .fraction(0.5)
-                        ])
-                        .presentationDragIndicator(.visible)
+            .sheet(isPresented: $viewModel.showingFestivalView) {
+                if let selectedFestival = viewModel.selectedFestival {
+                    NavigationStack {
+                        FestivalView(viewModel: FestivalViewModel(festival: selectedFestival, listViewModel: FestivalListViewModel()))
+                    }
+//                    .presentationDetents([.medium, .large])
+                    .presentationDetents([.height(295), .large])
                 }
             }
     }
@@ -25,8 +21,6 @@ struct MapView: View {
 // MARK: - Preview Provider
 struct MapView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationStack {
-            MapView()
-        }
+        MapView()
     }
 }

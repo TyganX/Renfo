@@ -3,16 +3,44 @@ import SwiftUI
 
 class FestivalViewModel: ObservableObject {
     @Published var festival: FestivalModel
-    
-    init(festival: FestivalModel) {
+    @Published var isFavorite: Bool = false
+    private let favoriteKey = "favoriteFestivals"
+    private let listViewModel: FestivalListViewModel
+
+    init(festival: FestivalModel, listViewModel: FestivalListViewModel) {
         self.festival = festival
+        self.listViewModel = listViewModel
+        loadFavoriteStatus()
     }
-    
+
+    func toggleFavorite() {
+        isFavorite.toggle()
+        saveFavoriteStatus()
+        listViewModel.refreshFavoriteSort()
+    }
+
+    private func loadFavoriteStatus() {
+        let favorites = UserDefaults.standard.stringArray(forKey: favoriteKey) ?? []
+        isFavorite = favorites.contains(festival.id ?? "")
+    }
+
+    private func saveFavoriteStatus() {
+        var favorites = UserDefaults.standard.stringArray(forKey: favoriteKey) ?? []
+        if isFavorite {
+            if let festivalID = festival.id, !favorites.contains(festivalID) {
+                favorites.append(festivalID)
+            }
+        } else {
+            favorites.removeAll { $0 == festival.id }
+        }
+        UserDefaults.standard.set(favorites, forKey: favoriteKey)
+    }
+
     var detailsLinks: [(key: String, value: (systemImage: String, text: String))] {
-        let formattedStartDate = convertStringToDate(dateString: festival.dateStart)?.formattedDateString() ?? festival.dateStart
-        let formattedEndDate = convertStringToDate(dateString: festival.dateEnd)?.formattedDateString() ?? festival.dateEnd
-        let formattedStartTime = convertTimeString(timeString: festival.timeStart) ?? festival.timeStart
-        let formattedEndTime = convertTimeString(timeString: festival.timeEnd) ?? festival.timeEnd
+        let formattedStartDate = festival.dateStart.toDate(format: "MM/dd/yyyy")?.formattedDateString() ?? festival.dateStart
+        let formattedEndDate = festival.dateEnd.toDate(format: "MM/dd/yyyy")?.formattedDateString() ?? festival.dateEnd
+        let formattedStartTime = festival.timeStart.toTime() ?? festival.timeStart
+        let formattedEndTime = festival.timeEnd.toTime() ?? festival.timeEnd
 
         let links: [(key: String, value: (systemImage: String, text: String))] = [
             ("dates", ("calendar", "\(formattedStartDate) - \(formattedEndDate)")),
@@ -75,8 +103,8 @@ class FestivalViewModel: ObservableObject {
     }
 
     var activeIndicatorText: String {
-        let startDate = convertStringToDate(dateString: self.festival.dateStart) ?? Date.distantFuture
-        let endDate = convertStringToDate(dateString: self.festival.dateEnd) ?? Date.distantPast
+        let startDate = festival.dateStart.toDate(format: "MM/dd/yyyy") ?? Date.distantFuture
+        let endDate = festival.dateEnd.toDate(format: "MM/dd/yyyy") ?? Date.distantPast
         let currentDate = Date()
 
         if (currentDate >= startDate && currentDate <= endDate) {

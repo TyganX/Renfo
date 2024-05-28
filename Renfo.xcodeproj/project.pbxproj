@@ -36,6 +36,7 @@
 		2F306BF72BF091F7000DD792 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F306BF62BF091F7000DD792 /* MapView.swift */; };
 		2F306BF92BF1C25E000DD792 /* FestivalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F306BF82BF1C25E000DD792 /* FestivalView.swift */; };
 		2F306BFD2BF1CA11000DD792 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F306BFC2BF1CA11000DD792 /* AboutView.swift */; };
+		2F6E99192C06408300696C72 /* MapViewRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F6E99182C06408300696C72 /* MapViewRepresentable.swift */; };
 		2F9F04992BF31E2400DA4FB9 /* ScalingHeaderScrollView in Frameworks */ = {isa = PBXBuildFile; productRef = 2F9F04982BF31E2400DA4FB9 /* ScalingHeaderScrollView */; };
 		2FB642B52BFBB897002E8292 /* VendorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FB642B42BFBB897002E8292 /* VendorView.swift */; };
 		2FB642B72BFBBCD4002E8292 /* VendorListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FB642B62BFBBCD4002E8292 /* VendorListView.swift */; };
@@ -81,6 +82,7 @@
 		2F306BF82BF1C25E000DD792 /* FestivalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FestivalView.swift; sourceTree = "<group>"; };
 		2F306BFC2BF1CA11000DD792 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		2F4E68352BEC15B400F86888 /* Renfo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Renfo.entitlements; sourceTree = "<group>"; };
+		2F6E99182C06408300696C72 /* MapViewRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewRepresentable.swift; sourceTree = "<group>"; };
 		2FB642B42BFBB897002E8292 /* VendorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VendorView.swift; sourceTree = "<group>"; };
 		2FB642B62BFBBCD4002E8292 /* VendorListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VendorListView.swift; sourceTree = "<group>"; };
 		2FD89E112BFFF15C00DCE49D /* FestivalViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FestivalViewModel.swift; sourceTree = "<group>"; };
@@ -326,6 +328,7 @@
 			isa = PBXGroup;
 			children = (
 				2F306BF62BF091F7000DD792 /* MapView.swift */,
+				2F6E99182C06408300696C72 /* MapViewRepresentable.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -437,6 +440,7 @@
 				2F0DA9672BE12EC800979111 /* ContentView.swift in Sources */,
 				2FB642B72BFBBCD4002E8292 /* VendorListView.swift in Sources */,
 				2F29FB222BF7DEAC00DD313C /* TestViews.swift in Sources */,
+				2F6E99192C06408300696C72 /* MapViewRepresentable.swift in Sources */,
 				2F306BFD2BF1CA11000DD792 /* AboutView.swift in Sources */,
 				2F11ABA42BFF89E3000451A4 /* FestivalListView-BeforeFavorites.swift in Sources */,
 				2F11ABB92BFFBACC000451A4 /* DateUtils.swift in Sources */,

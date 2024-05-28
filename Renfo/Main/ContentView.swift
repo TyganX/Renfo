@@ -1,20 +1,21 @@
 import SwiftUI
 
 struct ContentView: View {
-    // Retrieve the selected app color
     @AppStorage("appColor") var appColor: AppColor = .default
+    @StateObject private var listViewModel = FestivalListViewModel()
 
     var body: some View {
         TabView() {
             // Home Tab
             NavigationStack {
                 FestivalListView()
+                    .environmentObject(listViewModel)
             }
             .tabItem {
                 Image(systemName: "building.columns")
                 Text("Festivals")
             }
-            
+
             // Map Tab
             NavigationStack {
                 MapView()
@@ -33,7 +34,7 @@ struct ContentView: View {
                 Text("Settings")
             }
         }
-        .accentColor(appColor.color) // Apply the accent color to the TabView
+        .accentColor(appColor.color)
     }
 }
 
