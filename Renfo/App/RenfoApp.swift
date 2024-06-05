@@ -14,6 +14,8 @@ import Combine
 // MARK: - Main Application Entry Point
 @main
 struct RenfoApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    
     // MARK: - App Storage Properties
     @AppStorage("appTheme") private var appTheme: AppTheme = .system
     @AppStorage("selectedIcon") private var selectedIcon: AppIcon = .default
@@ -22,17 +24,6 @@ struct RenfoApp: App {
     // MARK: - State Object
     // SessionStore to manage user session state
     @StateObject private var sessionStore = SessionStore()
-
-    // MARK: - Initializer
-    init() {
-        // Firebase configuration
-        FirebaseApp.configure()
-        
-        // Enable Firestore offline persistence
-        let settings = Firestore.firestore().settings
-        settings.cacheSettings = PersistentCacheSettings()
-        Firestore.firestore().settings = settings
-    }
     
     // MARK: - Scene Builder
     var body: some Scene {

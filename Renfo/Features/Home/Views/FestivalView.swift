@@ -1,10 +1,14 @@
 import SwiftUI
+import UIKit
 
 // MARK: - Festival View
 struct FestivalView: View {
     @AppStorage("appColor") var appColor: AppColor = .default
     @State private var showingPopover = false
     @ObservedObject var viewModel: FestivalViewModel
+
+    // Create an instance of UIImpactFeedbackGenerator
+    let impactFeedbackGenerator = UIImpactFeedbackGenerator(style: .light)
 
     var body: some View {
         VStack {
@@ -14,13 +18,19 @@ struct FestivalView: View {
                 if !viewModel.detailsLinks.isEmpty {
                     Section(header: Text("Details")) {
                         ForEach(viewModel.detailsLinks, id: \.key) { link in
-                            Label {
-                                Text(link.value.text)
-                                    .font(.body)
-                                    .foregroundColor(.primary)
-                            } icon: {
-                                Image(systemName: link.value.systemImage)
-                                    .foregroundColor(nil)
+                            HStack {
+                                Label {
+                                    Text(link.value.text)
+                                        .font(.body)
+                                        .foregroundColor(.primary)
+                                } icon: {
+                                    Image(systemName: link.value.systemImage)
+                                        .foregroundColor(nil)
+                                }
+                                Spacer()
+                                if link.key == "dates" {
+                                    ActiveIndicator(isActive: link.value.isActive, daysUntilStart: link.value.daysUntilStart)
+                                }
                             }
                         }
                     }
@@ -43,20 +53,23 @@ struct FestivalView: View {
                     }
                 }
             }
-            .navigationTitle(viewModel.festival.id?.isEmpty == false ? "\(viewModel.festival.id!)" : "")
+            .navigationTitle(viewModel.festival.id?.isEmpty == false ? viewModel.festival.id!.uppercased() : "")
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarItems(trailing: favoriteButton)
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text(viewModel.festival.established.isEmpty ? "" : "Est. \(viewModel.festival.established)")
+                        .foregroundColor(.white)
                 }
             }
         }
+        .accentColor(appColor.color)
     }
 
     // MARK: - Favorite Button
     private var favoriteButton: some View {
         Button(action: {
+            impactFeedbackGenerator.impactOccurred() // Trigger haptic feedback
             viewModel.toggleFavorite()
         }) {
             Image(systemName: viewModel.isFavorite ? "star.fill" : "star")
@@ -81,6 +94,7 @@ struct FestivalView: View {
                         .font(.title3)
                         .fontWeight(.bold)
                         .padding(.bottom, 9)
+                        .foregroundColor(.white)
                     
                     headerButtons
                 }
@@ -113,7 +127,7 @@ struct FestivalView: View {
             }
             .frame(height: 40)
             .frame(maxWidth: .infinity)
-            .foregroundColor(.primary)
+            .foregroundColor(.white)
         }
         .buttonStyle(.bordered)
     }
@@ -178,6 +192,32 @@ struct ButtonConfig {
     let imageName: String
     let label: String
     let verticalPadding: CGFloat
+}
+
+// MARK: - Active Indicator
+struct ActiveIndicator: View {
+    let isActive: Bool
+    let daysUntilStart: Int?
+
+    var body: some View {
+        HStack {
+            if isActive {
+                PulsingView()
+                    .foregroundColor(.green)
+                    .frame(width: 10, height: 10)
+            } else {
+                ZStack {
+                    Circle()
+                        .fill(Color.red)
+                        .frame(width: 20, height: 20)
+                    Text(daysUntilStart ?? 0 >= 0 ? "\(daysUntilStart!)" : "?")
+                        .font(.system(size: 9))
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                }
+            }
+        }
+    }
 }
 
 // MARK: - Preview Provider

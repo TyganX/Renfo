@@ -2,7 +2,7 @@ import Foundation
 import FirebaseFirestoreSwift
 import FirebaseFirestore
 
-struct FestivalModel: Codable, Identifiable {
+struct FestivalModel: Codable, Identifiable, Hashable {
     @DocumentID var id: String?
     var address: String = ""
     var campgroundMapImage: String = ""
@@ -61,6 +61,15 @@ struct FestivalModel: Codable, Identifiable {
     }
 
     init() {}
+    
+    // Implementation of Hashable protocol
+     func hash(into hasher: inout Hasher) {
+         hasher.combine(id)
+     }
+
+     static func == (lhs: FestivalModel, rhs: FestivalModel) -> Bool {
+         return lhs.id == rhs.id
+     }
 }
 
 // Extension to provide a sample instance of FestivalModel for use in SwiftUI previews and testing.

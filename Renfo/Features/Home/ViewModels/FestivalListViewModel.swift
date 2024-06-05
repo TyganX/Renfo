@@ -52,9 +52,12 @@ class FestivalListViewModel: ObservableObject {
             return groupedByState.mapValues { $0.sorted(by: { $0.name < $1.name }) }
         case .active:
             let now = Date()
-            let activeFestivals = filteredFestivals.filter { $0.isActive }.sorted(by: { $0.name < $1.name })
-            let upcomingFestivals = filteredFestivals.filter { !($0.isActive) && ($0.dateStart.toDate(format: "MM/dd/yyyy") ?? Date.distantFuture) > now }.sorted(by: { $0.name < $1.name })
-            let tbaFestivals = filteredFestivals.filter { !($0.isActive) && ($0.dateEnd.toDate(format: "MM/dd/yyyy") ?? Date.distantPast) < now }.sorted(by: { $0.name < $1.name })
+            let activeFestivals = filteredFestivals.filter { $0.isActive }
+                .sorted(by: { ($0.dateStart.toDate(format: "MM/dd/yyyy") ?? Date.distantFuture) < ($1.dateStart.toDate(format: "MM/dd/yyyy") ?? Date.distantFuture) })
+            let upcomingFestivals = filteredFestivals.filter { !($0.isActive) && ($0.dateStart.toDate(format: "MM/dd/yyyy") ?? Date.distantFuture) > now }
+                .sorted(by: { ($0.dateStart.toDate(format: "MM/dd/yyyy") ?? Date.distantFuture) < ($1.dateStart.toDate(format: "MM/dd/yyyy") ?? Date.distantFuture) })
+            let tbaFestivals = filteredFestivals.filter { !($0.isActive) && ($0.dateEnd.toDate(format: "MM/dd/yyyy") ?? Date.distantPast) < now }
+                .sorted(by: { ($0.dateStart.toDate(format: "MM/dd/yyyy") ?? Date.distantFuture) < ($1.dateStart.toDate(format: "MM/dd/yyyy") ?? Date.distantFuture) })
             
             var activeSections: [String: [FestivalModel]] = [:]
             if !activeFestivals.isEmpty {
@@ -69,8 +72,10 @@ class FestivalListViewModel: ObservableObject {
             return activeSections
         case .favorite:
             let favorites = UserDefaults.standard.stringArray(forKey: "favoriteFestivals") ?? []
-            let favoriteFestivals = filteredFestivals.filter { favorites.contains($0.id ?? "") }.sorted(by: { $0.name < $1.name })
-            let nonFavoriteFestivals = filteredFestivals.filter { !favorites.contains($0.id ?? "") }.sorted(by: { $0.name < $1.name })
+            let favoriteFestivals = filteredFestivals.filter { favorites.contains($0.id ?? "") }
+                .sorted(by: { $0.name < $1.name })
+            let nonFavoriteFestivals = filteredFestivals.filter { !favorites.contains($0.id ?? "") }
+                .sorted(by: { $0.name < $1.name })
             
             var favoriteSections: [String: [FestivalModel]] = [:]
             if !favoriteFestivals.isEmpty {

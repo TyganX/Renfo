@@ -36,18 +36,24 @@ class FestivalViewModel: ObservableObject {
         UserDefaults.standard.set(favorites, forKey: favoriteKey)
     }
 
-    var detailsLinks: [(key: String, value: (systemImage: String, text: String))] {
-        let formattedStartDate = festival.dateStart.toDate(format: "MM/dd/yyyy")?.formattedDateString() ?? festival.dateStart
-        let formattedEndDate = festival.dateEnd.toDate(format: "MM/dd/yyyy")?.formattedDateString() ?? festival.dateEnd
-        let formattedStartTime = festival.timeStart.toTime() ?? festival.timeStart
-        let formattedEndTime = festival.timeEnd.toTime() ?? festival.timeEnd
+    var detailsLinks: [(key: String, value: (systemImage: String, text: String, isActive: Bool, daysUntilStart: Int?))] {
+            let formattedStartDate = festival.dateStart.toDate(format: "MM/dd/yyyy")?.formattedDateString() ?? festival.dateStart
+            let formattedEndDate = festival.dateEnd.toDate(format: "MM/dd/yyyy")?.formattedDateString() ?? festival.dateEnd
+            let formattedStartTime = festival.timeStart.toTime() ?? festival.timeStart
+            let formattedEndTime = festival.timeEnd.toTime() ?? festival.timeEnd
 
-        let links: [(key: String, value: (systemImage: String, text: String))] = [
-            ("dates", ("calendar", "\(formattedStartDate) - \(formattedEndDate)")),
-            ("hours", ("clock", "\(formattedStartTime) - \(formattedEndTime)"))
-        ]
-        return links.filter { !$0.value.text.isEmpty }
-    }
+            let startDate = festival.dateStart.toDate(format: "MM/dd/yyyy") ?? Date.distantFuture
+            let endDate = festival.dateEnd.toDate(format: "MM/dd/yyyy") ?? Date.distantPast
+            let currentDate = Date()
+            let isActive = (currentDate >= startDate && currentDate <= endDate)
+            let daysUntilStart = Calendar.current.dateComponents([.day], from: currentDate, to: startDate).day
+
+            let links: [(key: String, value: (systemImage: String, text: String, isActive: Bool, daysUntilStart: Int?))] = [
+                ("dates", ("calendar", "\(formattedStartDate) - \(formattedEndDate)", isActive, daysUntilStart)),
+                ("hours", ("clock", "\(formattedStartTime) - \(formattedEndTime)", false, nil))
+            ]
+            return links.filter { !$0.value.text.isEmpty }
+        }
 
     var resourceLinks: [(key: String, value: (label: String, systemImage: String, view: () -> AnyView))] {
         let links: [(key: String, value: (label: String, systemImage: String, view: () -> AnyView))] = [
@@ -58,7 +64,7 @@ class FestivalViewModel: ObservableObject {
             })),
             ("festivalMapImage", ("Festival Map", "map.fill", {
                 if !self.festival.festivalMapImage.isEmpty {
-                    return AnyView(NavigationLink(destination: ImageView(imageName: self.festival.festivalMapImage)) {
+                    return AnyView(NavigationLink(destination: ImageViewer(imageName: self.festival.festivalMapImage)) {
                         Label("Festival Map", systemImage: "map")
                     })
                 } else {
@@ -67,7 +73,7 @@ class FestivalViewModel: ObservableObject {
             })),
             ("campgroundMapImage", ("Campground Map", "map.circle.fill", {
                 if !self.festival.campgroundMapImage.isEmpty {
-                    return AnyView(NavigationLink(destination: ImageView(imageName: self.festival.campgroundMapImage)) {
+                    return AnyView(NavigationLink(destination: ImageViewer(imageName: self.festival.campgroundMapImage)) {
                         Label("Campground Map", systemImage: "map.circle")
                     })
                 } else {

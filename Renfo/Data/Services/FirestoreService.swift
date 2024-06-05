@@ -2,8 +2,16 @@ import Foundation
 import FirebaseFirestore
 import FirebaseFirestoreSwift
 
-class FirestoreService {
+class FirestoreService: ObservableObject {
     private let db = Firestore.firestore()
+    
+    @Published var festivals: [FestivalModel] = []
+    
+    init() {
+        fetchAllFestivals { [weak self] festivals in
+            self?.festivals = festivals
+        }
+    }
     
     // Fetch all festivals
     func fetchAllFestivals(completion: @escaping ([FestivalModel]) -> Void) {
