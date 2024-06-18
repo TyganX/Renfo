@@ -8,7 +8,10 @@ struct PulsingView: View {
             .scaleEffect(isAnimating ? 1.3 : 1.0)
             .opacity(isAnimating ? 0.5 : 1.0)
             .onAppear {
-                withAnimation(Animation.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
+                withAnimation(
+                    Animation.easeInOut(duration: 1.0)
+                        .repeatForever(autoreverses: true)
+                ) {
                     isAnimating = true
                 }
             }

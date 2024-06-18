@@ -13,6 +13,8 @@ class FestivalListViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     private var dataLoaded: Bool = false
 
+    private let firestoreService = FirestoreService()
+
     init() {
         let savedSortOption = UserDefaults.standard.integer(forKey: Constants.sortOptionKey)
         self.sortOption = SortOption(rawValue: savedSortOption) ?? .state
@@ -22,12 +24,18 @@ class FestivalListViewModel: ObservableObject {
         guard !dataLoaded else { return }
 
         isLoading = true
-        FirestoreService().fetchAllFestivals { fetchedFestivals in
+        firestoreService.fetchAllFestivals { fetchedFestivals in
             DispatchQueue.main.async {
                 self.festivals = fetchedFestivals
                 self.isLoading = false
                 self.dataLoaded = true
             }
+        }
+    }
+
+    func fetchImage(for imageName: String, completion: @escaping (UIImage?) -> Void) {
+        firestoreService.downloadImage(imageName: imageName) { image in
+            completion(image)
         }
     }
 

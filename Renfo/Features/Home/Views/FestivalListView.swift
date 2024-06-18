@@ -11,30 +11,27 @@ struct FestivalListView: View {
     // MARK: - View Body
     var body: some View {
         VStack {
-            if viewModel.isLoading {
-                ProgressView()
-                    .progressViewStyle(CircularProgressViewStyle())
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                festivalList
-                    .navigationTitle("Festivals")
-                    .searchable(text: $viewModel.searchText, prompt: "Search")
-                    .toolbar {
-                        ToolbarItem(placement: .navigationBarTrailing) {
-                            sortMenu
-                        }
+            festivalList
+                .navigationTitle("Festivals")
+                .searchable(text: $viewModel.searchText, prompt: "Search")
+                .refreshable {
+                    viewModel.fetchFestivals()
+                }
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        sortMenu
                     }
-                    .sheet(isPresented: $isShowingMailView) {
-                        MailView(isShowing: $isShowingMailView, result: $mailResult)
-                    }
-                    .alert(isPresented: $showAlert) {
-                        Alert(
-                            title: Text("Cannot Send Mail"),
-                            message: Text("Your device is not configured to send mail. Please configure a mail account in the Mail app or contact support."),
-                            dismissButton: .default(Text("OK"))
-                        )
-                    }
-            }
+                }
+                .sheet(isPresented: $isShowingMailView) {
+                    MailView(isShowing: $isShowingMailView, result: $mailResult)
+                }
+                .alert(isPresented: $showAlert) {
+                    Alert(
+                        title: Text("Cannot Send Mail"),
+                        message: Text("Your device is not configured to send mail. Please configure a mail account in the Mail app or contact support."),
+                        dismissButton: .default(Text("OK"))
+                    )
+                }
         }
         .onAppear {
             viewModel.fetchFestivals()
@@ -45,15 +42,19 @@ struct FestivalListView: View {
     private var festivalList: some View {
         List {
             ForEach(viewModel.sortedFestivals.keys.sorted(), id: \.self) { key in
-                Section(header: Text(key)) {
-                    ForEach(viewModel.sortedFestivals[key] ?? []) { festival in
-                        NavigationLink(destination: FestivalView(viewModel: FestivalViewModel(festival: festival, listViewModel: viewModel))) {
-                            FestivalRow(festival: festival)
-                        }
-                    }
-                }
+                festivalSection(for: key)
             }
             addFestivalFooter
+        }
+    }
+
+    private func festivalSection(for key: String) -> some View {
+        Section(header: Text(key)) {
+            ForEach(viewModel.sortedFestivals[key] ?? []) { festival in
+                NavigationLink(destination: FestivalView(viewModel: FestivalViewModel(festival: festival))) {
+                    FestivalRow(festival: festival)
+                }
+            }
         }
     }
 
@@ -96,16 +97,26 @@ struct FestivalListView: View {
 // MARK: - Festival Row
 struct FestivalRow: View {
     let festival: FestivalModel
+    @State private var logoImage: UIImage? = nil
+    @EnvironmentObject var viewModel: FestivalListViewModel
 
     var body: some View {
         HStack {
-            if !festival.logoImage.isEmpty {
-                Image(festival.logoImage)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 40, height: 40)
-            }
+            Image(uiImage: logoImage ?? UIImage())
+                .resizable()
+                .scaledToFit()
+                .frame(width: 40, height: 40)
+                .clipShape(Circle())  // Make the image a circle
+                .redacted(reason: logoImage == nil ? .placeholder : [])
+                .onAppear {
+                    if logoImage == nil {
+                        viewModel.fetchImage(for: festival.logoImage) { downloadedImage in
+                            self.logoImage = downloadedImage
+                        }
+                    }
+                }
             Text(festival.name)
+                .redacted(reason: viewModel.isLoading ? .placeholder : [])
         }
     }
 }

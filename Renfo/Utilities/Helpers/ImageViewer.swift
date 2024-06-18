@@ -2,7 +2,7 @@ import SwiftUI
 import UIKit
 
 struct ImageViewer: UIViewRepresentable {
-    let imageName: String
+    let image: UIImage
 
     func makeUIView(context: Context) -> UIScrollView {
         let scrollView = UIScrollView()
@@ -13,7 +13,7 @@ struct ImageViewer: UIViewRepresentable {
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.showsVerticalScrollIndicator = false
 
-        let imageView = UIImageView(image: UIImage(named: imageName))
+        let imageView = UIImageView(image: image)
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.addSubview(imageView)

@@ -83,8 +83,13 @@ struct FestivalView: View {
             ZStack {
                 ParticleView()
                 VStack(alignment: .center, spacing: 0) {
-                    if !viewModel.festival.logoImage.isEmpty {
-                        Image(viewModel.festival.logoImage)
+                    if let logoImage = viewModel.logoImage {
+                        Image(uiImage: logoImage)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 200)
+                    } else {
+                        Image(systemName: "circle.fill")
                             .resizable()
                             .scaledToFit()
                             .frame(height: 200)
@@ -224,7 +229,7 @@ struct ActiveIndicator: View {
 struct FestivalView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationStack {
-            FestivalView(viewModel: FestivalViewModel(festival: .sample, listViewModel: FestivalListViewModel()))
+            FestivalView(viewModel: FestivalViewModel(festival: .sample))
         }
     }
 }

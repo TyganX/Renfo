@@ -12,9 +12,7 @@ struct MapView: View {
 
     // MARK: - View Body
     var body: some View {
-        ZStack {
-            map
-        }
+        map
         .safeAreaInset(edge: .top) {
             Color.clear
                 .frame(height: 0)
@@ -44,6 +42,7 @@ struct MapView: View {
             }
             UserAnnotation()
         }
+//        .mapFeatureSelectionAccessory()
         .safeAreaInset(edge: .top) {
             Color.clear
                 .frame(height: 150)
@@ -106,10 +105,12 @@ struct SheetView: View {
     
     var body: some View {
         NavigationStack {
-            FestivalView(viewModel: FestivalViewModel(festival: festival, listViewModel: FestivalListViewModel()))
+            FestivalView(viewModel: FestivalViewModel(festival: festival))
         }
+//        .presentationDetents([.height(295), .fraction(0.99)])
         .presentationDetents([.height(295), .large])
         .presentationBackground(.regularMaterial)
+//        .presentationBackgroundInteraction(.enabled(upThrough: .fraction(0.99)))
         .presentationBackgroundInteraction(.enabled(upThrough: .large))
     }
 }

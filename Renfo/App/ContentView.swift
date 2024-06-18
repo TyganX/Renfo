@@ -13,6 +13,7 @@ struct ContentView: View {
             }
             .tabItem {
                 Image(systemName: "building.columns")
+//                    .symbolEffect(.wiggle)
                 Text("Festivals")
             }
 
