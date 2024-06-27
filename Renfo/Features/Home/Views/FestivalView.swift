@@ -200,18 +200,27 @@ struct FestivalView: View {
     
     // MARK: - Footer Section
     private var footerSection: some View {
-        HStack {
-            Spacer()
-            Image(systemName: "laurel.leading")
-                .font(.system(size: 25))
-            Text(viewModel.festival.established.isEmpty ? "" : "Est. \(viewModel.festival.established)")
-            Image(systemName: "laurel.trailing")
-                .font(.system(size: 25))
-            Spacer()
+        establishedBanner
+    }
+    
+    // MARK: - Established Banner
+    private var establishedBanner: some View {
+        Group {
+            if !viewModel.festival.established.isEmpty {
+                HStack {
+                    Spacer()
+                    Image(systemName: "laurel.leading")
+                        .font(.system(size: 30))
+                    Text("Est. \(viewModel.festival.established)")
+                    Image(systemName: "laurel.trailing")
+                        .font(.system(size: 30))
+                    Spacer()
+                }
+                .foregroundStyle(.secondary)
+                .fontWeight(.bold)
+                .listRowBackground(Color.clear)
+            }
         }
-        .foregroundStyle(.secondary)
-        .fontWeight(.bold)
-        .listRowBackground(Color.clear)
     }
 }
 
