@@ -2,6 +2,7 @@ import SwiftUI
 import MessageUI
 
 // MARK: - Home View
+@available(iOS 18.0, *)
 struct FestivalListView: View {
     @EnvironmentObject var viewModel: FestivalListViewModel
     @State private var isShowingMailView = false
@@ -14,9 +15,6 @@ struct FestivalListView: View {
             festivalList
                 .navigationTitle("Festivals")
                 .searchable(text: $viewModel.searchText, prompt: "Search")
-                .refreshable {
-                    viewModel.fetchFestivals()
-                }
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         sortMenu
@@ -34,6 +32,9 @@ struct FestivalListView: View {
                 }
         }
         .onAppear {
+            viewModel.fetchFestivals()
+        }
+        .refreshable {
             viewModel.fetchFestivals()
         }
     }
@@ -122,6 +123,7 @@ struct FestivalRow: View {
 }
 
 // MARK: - Preview Provider
+@available(iOS 18.0, *)
 struct FestivalListView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationStack {

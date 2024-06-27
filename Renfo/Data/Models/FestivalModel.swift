@@ -100,7 +100,7 @@ extension FestivalModel {
         festival.timeStart = "0900"
         festival.website = "https://www.texrenfest.com"
         festival.xHandle = "texrenfest"
-        festival.youTubeChannel = "texrenfest"
+        festival.youTubeChannel = "@texasrenaissancefestival3257"
         return festival
     }
 }

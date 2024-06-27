@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 import Combine
+import FirebaseFirestore
 
 class FestivalViewModel: ObservableObject {
     @Published var festival: FestivalModel
@@ -54,6 +55,21 @@ class FestivalViewModel: ObservableObject {
         UserDefaults.standard.set(favorites, forKey: favoriteKey)
     }
 
+    func openLocationInAppleMaps() {
+        if let coordinates = festival.coordinates {
+            let latitude = coordinates.latitude
+            let longitude = coordinates.longitude
+            let url = URL(string: "http://maps.apple.com/?q=\(latitude),\(longitude)")!
+            if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url)
+            } else {
+                print("Can't open Apple Maps.")
+            }
+        } else {
+            print("Coordinates not found.")
+        }
+    }
+
     var detailsLinks: [(key: String, value: (systemImage: String, text: String, isActive: Bool, daysUntilStart: Int?))] {
         let formattedStartDate = festival.dateStart.toDate(format: "MM/dd/yyyy")?.formattedDateString() ?? festival.dateStart
         let formattedEndDate = festival.dateEnd.toDate(format: "MM/dd/yyyy")?.formattedDateString() ?? festival.dateEnd
@@ -77,7 +93,7 @@ class FestivalViewModel: ObservableObject {
         let links: [(key: String, value: (label: String, systemImage: String, view: () -> AnyView))] = [
             ("vendors", ("Vendors", "cart", {
                 AnyView(NavigationLink(destination: VendorListView(festivalID: self.festival.id ?? "")) {
-                    Label("Vendors", systemImage: "cart")
+                    Label("Merchants", systemImage: "cart")
                 })
             })),
             ("festivalMapImage", ("Festival Map", "map.fill", {

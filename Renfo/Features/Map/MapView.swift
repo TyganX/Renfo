@@ -2,6 +2,7 @@ import SwiftUI
 import MapKit
 
 // MARK: - Map View
+@available(iOS 18.0, *)
 struct MapView: View {
     @StateObject private var firestoreService = FirestoreService() // Manages data fetching from Firestore
     @StateObject private var locationManager = LocationManager() // Manages user location updates
@@ -17,6 +18,7 @@ struct MapView: View {
             Color.clear
                 .frame(height: 0)
                 .background(.ultraThinMaterial)
+//                .blur(radius: 15)
         }
         .sheet(isPresented: $isSheetPresented) {
             if let festival = selectedFestival {
@@ -41,11 +43,12 @@ struct MapView: View {
                 }
             }
             UserAnnotation()
+            .mapItemDetailSelectionAccessory(.callout)
         }
-//        .mapFeatureSelectionAccessory()
+        .mapFeatureSelectionAccessory(.callout)
         .safeAreaInset(edge: .top) {
             Color.clear
-                .frame(height: 150)
+                .frame(height: 160)
         }
         .mapStyle(isHybridStyle ? .hybrid(elevation: .realistic) : .standard) // Toggle between hybrid and standard map styles
         .ignoresSafeArea(edges: .all) // Extend the map to the edges of the screen
@@ -83,7 +86,8 @@ struct MapView: View {
         .foregroundColor(.blue)
         .background(.ultraThinMaterial) // Background with ultra thin material effect
         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous)) // Rounded rectangle with continuous style for smooth corners
-        .padding([.top, .trailing], 5) // Padding to position the button group
+        .padding(.top, 15) // Padding to position the button group
+        .padding(.trailing, 5) // Padding to position the button group
     }
     
     // MARK: - Center on User Location
@@ -100,6 +104,7 @@ struct MapView: View {
 }
 
 // MARK: - Sheet View
+@available(iOS 18.0, *)
 struct SheetView: View {
     var festival: FestivalModel // Take the festival as an input
     
@@ -107,15 +112,16 @@ struct SheetView: View {
         NavigationStack {
             FestivalView(viewModel: FestivalViewModel(festival: festival))
         }
-//        .presentationDetents([.height(295), .fraction(0.99)])
-        .presentationDetents([.height(295), .large])
+//        .presentationDetents([.height(295), .large])
+        .presentationDetents([.height(375), .fraction(0.99)])
         .presentationBackground(.regularMaterial)
-//        .presentationBackgroundInteraction(.enabled(upThrough: .fraction(0.99)))
-        .presentationBackgroundInteraction(.enabled(upThrough: .large))
+        .presentationBackgroundInteraction(.enabled(upThrough: .fraction(0.99)))
+//        .presentationBackgroundInteraction(.enabled(upThrough: .large))
     }
 }
 
 // MARK: - Preview Provider
+@available(iOS 18.0, *)
 struct MapView_Previews: PreviewProvider {
     static var previews: some View {
         MapView()

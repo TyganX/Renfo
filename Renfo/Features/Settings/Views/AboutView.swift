@@ -10,6 +10,12 @@ import SwiftUI
 
 struct AboutView: View {
     var body: some View {
+        Image(systemName: "timelapse")
+            .font(.system(size: 64))
+            .symbolRenderingMode(.multicolor)
+//            .symbolEffect(.variableColor)
+            .symbolEffect(.variableColor.iterative)
+//            .symbolEffect(.variableColor.hideInactiveLayers.reversing)
         Text("Coming Soon")
     }
 }

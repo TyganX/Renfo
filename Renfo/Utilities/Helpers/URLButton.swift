@@ -38,6 +38,38 @@ struct URLButtonCustom: View {
     }
 }
 
+struct SocialButton: View {
+    let label: String
+    let image: Image
+    let handle: String
+    let urlString: String
+
+    var body: some View {
+        Button(action: {
+            if let url = URL(string: urlString) {
+                UIApplication.shared.open(url)
+            }
+        }) {
+            HStack {
+                Label {
+                    Text(handle)
+                        .lineLimit(1)
+//                        .minimumScaleFactor(0.5)
+                } icon: {
+                    image
+                }
+                Spacer()
+                Image(systemName: "chevron.up")
+                    .foregroundStyle(.placeholder)
+                    .fontWeight(.bold)
+                    .rotationEffect(.degrees(45))
+                    .font(.system(size: 13))
+            }
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+}
+
 struct URLButtonInApp: View {
     let label: String
     let systemImage: String

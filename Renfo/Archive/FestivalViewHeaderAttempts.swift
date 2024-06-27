@@ -12,7 +12,6 @@ struct FestivalView: View {
         VStack {
             List {
                 bodySection
-                footerSection
             }
             .onScrollGeometryChange(for: CGFloat.self) { geometry in
                 return geometry.contentOffset.y
@@ -25,13 +24,13 @@ struct FestivalView: View {
         .toolbarBackground(.hidden, for: .navigationBar)
         .navigationBarItems(trailing: favoriteButton)
         .safeAreaInset(edge: .top) {
-            headerSection
+            headerSectionShrinkAnimation
         }
         .edgesIgnoringSafeArea(.top)
     }
     
-    // MARK: - Header Section
-    private var headerSection: some View {
+    // MARK: - Header Section Test | Shrink logo while scrolling
+    private var headerSectionShrinkAnimation: some View {
         VStack {
             Group {
                 Image(uiImage: viewModel.logoImage ?? UIImage())
@@ -56,13 +55,130 @@ struct FestivalView: View {
             headerButtons
         }
         .padding(.top, 95)
-        .background(MeshgradientAnimation()
+        .background(LinearGradient(colors: [.green.opacity(0.3), .blue.opacity(0.5)], startPoint: .top, endPoint: .bottom)
             .overlay(.ultraThinMaterial)
         )
-//        .background(LinearGradient(colors: [.green.opacity(0.3), .blue.opacity(0.5)], startPoint: .top, endPoint: .bottom)
-//            .overlay(.ultraThinMaterial)
-//        )
         .offset(y: min(0, max(-420 - scrollOffset, -200)))
+    }
+    
+    // MARK: - Header Section Test | Shrink logo while scrolling to give scroll effect (OLD)
+    private var headerSectionShrinkToMove: some View {
+        VStack {
+            Image(uiImage: viewModel.logoImage ?? UIImage())
+                .resizable()
+                .scaledToFit()
+                .frame(height: scrollOffset < -420 ? 200 : min(200, -200 - scrollOffset))
+                .clipShape(Circle())
+                .redacted(reason: viewModel.logoImage == nil ? .placeholder : [])
+            
+            Text(viewModel.festival.name)
+                .font(.title3)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+            
+            headerButtons
+        }
+        .background(.ultraThinMaterial)
+        .padding(.top, 95)
+    }
+    
+    // MARK: - Header Section Test | Shrink logo when scrolling far enough
+    private var headerSectionShrink: some View {
+        VStack {
+            Group {
+                Image(uiImage: viewModel.logoImage ?? UIImage())
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: scrollOffset >= -200 ? 40: 200, height: scrollOffset >= -200 ? 40: 200) // Shrink logo when scrolling far enough
+                    .clipShape(Circle())
+                    .redacted(reason: viewModel.logoImage == nil ? .placeholder : [])
+            }
+            .frame(height: 200, alignment: .bottom)
+            
+            Group {
+                Text(viewModel.festival.name)
+                    .foregroundColor(.white)
+                    .font(scrollOffset >= -200 ? .body: .title3)
+                    .fontWeight(scrollOffset >= -200 ? .regular: .bold)
+            }
+            .frame(height: 30)
+            
+            headerButtons
+        }
+        .padding(.top, 95)
+        .background(LinearGradient(colors: [.green.opacity(0.3), .blue.opacity(0.5)], startPoint: .top, endPoint: .bottom)
+            .overlay(.ultraThinMaterial)
+        )
+//        .background(.ultraThinMaterial)
+        .offset(y: max(-420 - scrollOffset, -200))
+    }
+    
+    // MARK: - Header Section Test | Hide logo when scrolling far enough
+    private var headerSectionHide: some View {
+        VStack {
+            Image(uiImage: viewModel.logoImage ?? UIImage())
+                .resizable()
+                .scaledToFit()
+                .frame(width: 200, height: 200)
+                .clipShape(Circle())
+                .offset(y: scrollOffset >= -220 ? -100: 0) // Hide logo when scrolling far enough
+                .redacted(reason: viewModel.logoImage == nil ? .placeholder : [])
+            
+            Text(viewModel.festival.name)
+                .font(.title3)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+            
+            headerButtons
+        }
+        .padding(.top, 95)
+        .background(.ultraThinMaterial)
+        .offset(y: max(-420 - scrollOffset, -200))
+    }
+    
+    // MARK: - Header Section | original before consolidating
+    private var headerSectionOriginal: some View {
+        VStack {
+            if let logoImage = viewModel.logoImage {
+               Image(uiImage: logoImage)
+                   .resizable()
+                   .scaledToFit()
+                   .frame(height: 200)
+//                   .frame(height: scrollOffset < -420 ? 200 : min(200, -200 - scrollOffset))
+//                   .frame(minHeight: 50)
+//                   .frame(maxHeight: 200)
+//                   .frame(width: 200, height: max(50, min(200, 200 - scrollOffset)))
+//                   .frame(width: 200, height: min(200, -200 - scrollOffset))
+//                   .frame(height: scrollOffset >= -200 ? 40: 200) // Shrink logo when scrolling far enough
+                   .offset(y: scrollOffset >= -200 ? -100: 0) // Hide logo when scrolling far enough
+//                   .offset(y: max(min(-420 - scrollOffset, 0), -420))
+//                   .offset(y:  max(-420 - scrollOffset, -420))
+//                   .offset(y: max(0, scrollOffset * 0.5) - 60)
+//                   .offset(y: max(-450 - scrollOffset, -2000))
+                   .padding(.top, 95)
+            } else {
+                Image(systemName: "circle.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 200)
+                    .clipShape(Circle())  // Make the image a circle
+                    .offset(y: scrollOffset >= -200 ? -100: 0) // Hide logo when scrolling far enough
+                    .padding(.top, 95)
+                    .redacted(reason: logoImage == nil ? .placeholder : [])
+            }
+            
+            Text(viewModel.festival.name)
+                .font(.title3)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+            
+            headerButtons
+        }
+//        .background(Color.black.opacity(0.4))
+        .background(.ultraThinMaterial)
+//        .offset(y: scrollOffset >= -200 ? -40: max(-420 - scrollOffset, -200)) // Goes with shrinking logo
+        .offset(y: max(-420 - scrollOffset, -200)) // Goes with hiding logo
+//        .offset(y: max(-420, min(-240, -420 - scrollOffset)))
     }
     
     // MARK: - Header Buttons
@@ -197,30 +313,6 @@ struct FestivalView: View {
             }
         }
     }
-    
-    // MARK: - Footer Section
-    private var footerSection: some View {
-        HStack {
-            Spacer()
-            Image(systemName: "laurel.leading")
-                .font(.system(size: 25))
-            Text(viewModel.festival.established.isEmpty ? "" : "Est. \(viewModel.festival.established)")
-            Image(systemName: "laurel.trailing")
-                .font(.system(size: 25))
-            Spacer()
-        }
-        .foregroundStyle(.secondary)
-        .fontWeight(.bold)
-        .listRowBackground(Color.clear)
-    }
-}
-
-// MARK: - Button Config Struct
-struct ButtonConfig {
-    let action: () -> Void
-    let imageName: String
-    let label: String
-    let verticalPadding: CGFloat
 }
 
 // MARK: - Preview Provider

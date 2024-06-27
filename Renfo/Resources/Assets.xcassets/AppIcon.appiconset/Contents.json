@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "RenfoIcon6.png",
+      "filename" : "RenfoIcon-Light.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -13,7 +13,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "RenfoIconDark2.png",
+      "filename" : "RenfoIcon-Dark.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -25,7 +25,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "RenfoIconTinted.png",
+      "filename" : "RenfoIcon-Tinted.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"

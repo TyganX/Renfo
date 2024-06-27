@@ -12,6 +12,7 @@ import FirebaseStorage
 import Combine
 
 // MARK: - Main Application Entry Point
+@available(iOS 18.0, *)
 @main
 struct RenfoApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate

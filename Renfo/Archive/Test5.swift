@@ -1,70 +1,87 @@
 import SwiftUI
+import UIKit
 
-@available(iOS 18.0, *)
-struct FestivalView: View {
+// MARK: - Festival View
+struct FestivalView1: View {
+    @AppStorage("appColor") var appColor: AppColor = .default
+    @State private var showingPopover = false
     @ObservedObject var viewModel: FestivalViewModel
-    
-    @State private var logoImage: UIImage? = nil
-    @State private var scrollOffset: CGFloat = 0
+
+    // Create an instance of UIImpactFeedbackGenerator
     let impactFeedbackGenerator = UIImpactFeedbackGenerator(style: .light)
-    
+
     var body: some View {
-        VStack {
-            List {
+        ScrollView {
+            VStack {
+                headerSection
                 bodySection
-                footerSection
-            }
-            .onScrollGeometryChange(for: CGFloat.self) { geometry in
-                return geometry.contentOffset.y
-            } action: { oldValue, newValue in
-                scrollOffset = newValue
-//                print("Scroll Offset: \(scrollOffset)") // Debugging print statement
             }
         }
-        .scrollIndicators(.hidden)
-        .toolbarBackground(.hidden, for: .navigationBar)
+        .navigationTitle(viewModel.festival.id?.isEmpty == false ? viewModel.festival.id!.uppercased() : "")
+        .navigationBarTitleDisplayMode(.inline)
         .navigationBarItems(trailing: favoriteButton)
-        .safeAreaInset(edge: .top) {
-            headerSection
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text(viewModel.festival.established.isEmpty ? "" : "Est. \(viewModel.festival.established)")
+                    .foregroundColor(.white)
+            }
         }
-        .edgesIgnoringSafeArea(.top)
+        .accentColor(appColor.color)
     }
-    
+
+    // MARK: - Favorite Button
+    private var favoriteButton: some View {
+        Button(action: {
+            impactFeedbackGenerator.impactOccurred() // Trigger haptic feedback
+            viewModel.toggleFavorite()
+        }) {
+            Image(systemName: viewModel.isFavorite ? "star.fill" : "star")
+                .foregroundColor(viewModel.isFavorite ? .yellow : .gray)
+        }
+    }
+
     // MARK: - Header Section
     private var headerSection: some View {
         VStack {
-            Group {
-                Image(uiImage: viewModel.logoImage ?? UIImage())
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: max(40, min(200, -180 - scrollOffset)))
-                    .frame(height: max(40, min(200, -180 - scrollOffset)))
-                    .clipShape(Circle())
-                    .redacted(reason: viewModel.logoImage == nil ? .placeholder : [])
+            ZStack {
+                VStack(alignment: .center, spacing: 0) {
+                    if let logoImage = viewModel.logoImage {
+                        Image(uiImage: logoImage)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 200)
+                    } else {
+                        Image(systemName: "circle.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 200)
+                    }
+                    
+                    GeometryReader { geo in
+                        let minY = geo.frame(in: .global).minY
+                        VStack {
+                            Text(viewModel.festival.name)
+                                .font(.title3)
+                                .fontWeight(.bold)
+                                .padding(.bottom, 9)
+                                .foregroundColor(.white)
+                            
+                            headerButtons
+                        }
+                        .frame(maxWidth: .infinity)
+                        .offset(y: max(60 - minY, 0))
+                    }
+                    .padding(.horizontal)
+                    .offset(y: 0)
+                    .zIndex(1)
+                }
             }
-            .frame(height: 200, alignment: .bottom)
-            
-            Group {
-                Text(viewModel.festival.name)
-                    .foregroundColor(.white)
-                    .fontDesign(.rounded)
-                    .font(scrollOffset >= -220 ? .body: .title3)
-                    .fontWeight(scrollOffset >= -220 ? .regular: .bold)
-            }
-            .frame(height: 30)
-            
-            headerButtons
+            .frame(height: 300)
+            .frame(maxWidth: .infinity)
         }
-        .padding(.top, 95)
-        .background(MeshgradientAnimation()
-            .overlay(.ultraThinMaterial)
-        )
-//        .background(LinearGradient(colors: [.green.opacity(0.3), .blue.opacity(0.5)], startPoint: .top, endPoint: .bottom)
-//            .overlay(.ultraThinMaterial)
-//        )
-        .offset(y: min(0, max(-420 - scrollOffset, -200)))
+        .background(.ultraThinMaterial)
     }
-    
+
     // MARK: - Header Buttons
     private var headerButtons: some View {
         HStack {
@@ -72,8 +89,6 @@ struct FestivalView: View {
                 createButton(config: config)
             }
         }
-        .padding(.horizontal)
-        .padding(.bottom)
     }
 
     private func createButton(config: ButtonConfig) -> some View {
@@ -124,7 +139,10 @@ struct FestivalView: View {
             ),
             ButtonConfig(
                 action: {
-                    viewModel.openLocationInAppleMaps()
+                    let mapLink = viewModel.festival.locationMapLink
+                    if let url = URL(string: mapLink) {
+                        UIApplication.shared.open(url)
+                    }
                 },
                 imageName: "arrow.triangle.turn.up.right.circle.fill",
                 label: "Directions",
@@ -143,21 +161,10 @@ struct FestivalView: View {
             )
         ]
     }
-    
-    // MARK: - Favorite Button
-    private var favoriteButton: some View {
-        Button(action: {
-            impactFeedbackGenerator.impactOccurred() // Trigger haptic feedback
-            viewModel.toggleFavorite()
-        }) {
-            Image(systemName: viewModel.isFavorite ? "star.fill" : "star")
-                .foregroundColor(viewModel.isFavorite ? .yellow : .gray)
-        }
-    }
-    
+
     // MARK: - Body Section
     private var bodySection: some View {
-        Group {
+        VStack(alignment: .leading, spacing: 16) {
             if !viewModel.detailsLinks.isEmpty {
                 Section(header: Text("Details")) {
                     ForEach(viewModel.detailsLinks, id: \.key) { link in
@@ -178,7 +185,6 @@ struct FestivalView: View {
                     }
                 }
             }
-            
             if !viewModel.resourceLinks.isEmpty {
                 Section(header: Text("Resources")) {
                     ForEach(viewModel.resourceLinks, id: \.key) { link in
@@ -186,49 +192,58 @@ struct FestivalView: View {
                     }
                 }
             }
-            
             if !viewModel.socialLinks.isEmpty {
                 Section(header: Text("Social")) {
                     ForEach(viewModel.socialLinks.keys.sorted(), id: \.self) { key in
                         let link = viewModel.socialLinks[key]!
-                        SocialButton(label: link.label, image: Image(link.systemImage), handle: link.url, urlString: "https://www.\(key).com/\(link.url)")
+                        URLButtonCustom(label: link.label, image: Image(link.systemImage), urlString: "https://www.\(key).com/\(link.url)")
                     }
                 }
             }
         }
-    }
-    
-    // MARK: - Footer Section
-    private var footerSection: some View {
-        HStack {
-            Spacer()
-            Image(systemName: "laurel.leading")
-                .font(.system(size: 25))
-            Text(viewModel.festival.established.isEmpty ? "" : "Est. \(viewModel.festival.established)")
-            Image(systemName: "laurel.trailing")
-                .font(.system(size: 25))
-            Spacer()
-        }
-        .foregroundStyle(.secondary)
-        .fontWeight(.bold)
-        .listRowBackground(Color.clear)
+        .padding(.horizontal)
     }
 }
 
-// MARK: - Button Config Struct
-struct ButtonConfig {
-    let action: () -> Void
-    let imageName: String
-    let label: String
-    let verticalPadding: CGFloat
-}
+//// MARK: - Button Config Struct
+//struct ButtonConfig {
+//    let action: () -> Void
+//    let imageName: String
+//    let label: String
+//    let verticalPadding: CGFloat
+//}
+//
+//// MARK: - Active Indicator
+//struct ActiveIndicator: View {
+//    let isActive: Bool
+//    let daysUntilStart: Int?
+//
+//    var body: some View {
+//        HStack {
+//            if isActive {
+//                PulsingView()
+//                    .foregroundColor(.green)
+//                    .frame(width: 10, height: 10)
+//            } else {
+//                ZStack {
+//                    Circle()
+//                        .fill(Color.red)
+//                        .frame(width: 20, height: 20)
+//                    Text(daysUntilStart ?? 0 >= 0 ? "\(daysUntilStart!)" : "?")
+//                        .font(.system(size: 9))
+//                        .fontWeight(.bold)
+//                        .foregroundColor(.white)
+//                }
+//            }
+//        }
+//    }
+//}
 
 // MARK: - Preview Provider
-@available(iOS 18.0, *)
-struct FestivalView_Previews: PreviewProvider {
+struct FestivalView1_Previews: PreviewProvider {
     static var previews: some View {
         NavigationStack {
-            FestivalView(viewModel: FestivalViewModel(festival: .sample))
+            FestivalView1(viewModel: FestivalViewModel(festival: .sample))
         }
     }
 }
