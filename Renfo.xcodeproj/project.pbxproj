@@ -35,7 +35,17 @@
 		2F306BFD2BF1CA11000DD792 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F306BFC2BF1CA11000DD792 /* AboutView.swift */; };
 		2F3FD1B22C2DCE75002899A1 /* Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F3FD1B12C2DCE73002899A1 /* Test.swift */; };
 		2F3FD1B62C2DDF1D002899A1 /* ActiveIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F3FD1B52C2DDF15002899A1 /* ActiveIndicator.swift */; };
-		2FB3A7612C092658005C9397 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FB3A7602C092658005C9397 /* AppDelegate.swift */; };
+		2F481E4F2C359753009BE519 /* AnimatedGradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F481E4E2C359748009BE519 /* AnimatedGradientView.swift */; };
+		2F481E512C3598B4009BE519 /* ColoredButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F481E502C3598AE009BE519 /* ColoredButton.swift */; };
+		2F481E532C35E79F009BE519 /* StateAbbreviations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F481E522C35E79A009BE519 /* StateAbbreviations.swift */; };
+		2F7576582C2F3922004BE1CA /* MapSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F7576572C2F3914004BE1CA /* MapSnapshot.swift */; };
+		2F75765A2C2F59B3004BE1CA /* Test2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F7576592C2F59AF004BE1CA /* Test2.swift */; };
+		2F75765C2C2F610F004BE1CA /* Test3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F75765B2C2F610D004BE1CA /* Test3.swift */; };
+		2F75765E2C2FB442004BE1CA /* MapViewBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F75765D2C2FB43E004BE1CA /* MapViewBackup.swift */; };
+		2F7576602C2FBCB0004BE1CA /* IsFestivalActive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F75765F2C2FBC95004BE1CA /* IsFestivalActive.swift */; };
+		2F7576632C32FF77004BE1CA /* WishKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2F7576622C32FF77004BE1CA /* WishKit */; };
+		2F7576652C330383004BE1CA /* WishKitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F7576642C330380004BE1CA /* WishKitView.swift */; };
+		2F81FB462C4B165000C00264 /* MapSections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F81FB452C4B164B00C00264 /* MapSections.swift */; };
 		2FB3A7652C099049005C9397 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FB3A7642C099049005C9397 /* MapView.swift */; };
 		2FB3A7672C0A3695005C9397 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FB3A7662C0A3695005C9397 /* LocationManager.swift */; };
 		2FB533EC2C24BAD40003FDA7 /* MeshgradientAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FB533EB2C24BACB0003FDA7 /* MeshgradientAnimation.swift */; };
@@ -81,8 +91,17 @@
 		2F306BFC2BF1CA11000DD792 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		2F3FD1B12C2DCE73002899A1 /* Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Test.swift; sourceTree = "<group>"; };
 		2F3FD1B52C2DDF15002899A1 /* ActiveIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveIndicator.swift; sourceTree = "<group>"; };
+		2F481E4E2C359748009BE519 /* AnimatedGradientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedGradientView.swift; sourceTree = "<group>"; };
+		2F481E502C3598AE009BE519 /* ColoredButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColoredButton.swift; sourceTree = "<group>"; };
+		2F481E522C35E79A009BE519 /* StateAbbreviations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StateAbbreviations.swift; sourceTree = "<group>"; };
 		2F4E68352BEC15B400F86888 /* Renfo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Renfo.entitlements; sourceTree = "<group>"; };
-		2FB3A7602C092658005C9397 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		2F7576572C2F3914004BE1CA /* MapSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapSnapshot.swift; sourceTree = "<group>"; };
+		2F7576592C2F59AF004BE1CA /* Test2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Test2.swift; sourceTree = "<group>"; };
+		2F75765B2C2F610D004BE1CA /* Test3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Test3.swift; sourceTree = "<group>"; };
+		2F75765D2C2FB43E004BE1CA /* MapViewBackup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewBackup.swift; sourceTree = "<group>"; };
+		2F75765F2C2FBC95004BE1CA /* IsFestivalActive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IsFestivalActive.swift; sourceTree = "<group>"; };
+		2F7576642C330380004BE1CA /* WishKitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WishKitView.swift; sourceTree = "<group>"; };
+		2F81FB452C4B164B00C00264 /* MapSections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapSections.swift; sourceTree = "<group>"; };
 		2FB3A7642C099049005C9397 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 		2FB3A7662C0A3695005C9397 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		2FB533EB2C24BACB0003FDA7 /* MeshgradientAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeshgradientAnimation.swift; sourceTree = "<group>"; };
@@ -107,6 +126,7 @@
 				2FF991F72BE9488E00587C68 /* FirebaseAuth in Frameworks */,
 				2FF991F92BE9488E00587C68 /* FirebaseFirestore in Frameworks */,
 				2F11AB9A2BFD0CEC000451A4 /* FirebaseFirestoreSwift in Frameworks */,
+				2F7576632C32FF77004BE1CA /* WishKit in Frameworks */,
 				2F11AB952BFBF22B000451A4 /* FirebaseStorage in Frameworks */,
 				2F11AB972BFBF22B000451A4 /* FirebaseStorageCombine-Community in Frameworks */,
 			);
@@ -140,28 +160,19 @@
 				2FF1477F2BF67223001CD1A9 /* Data */,
 				2F11ABA92BFFB945000451A4 /* Utilities */,
 				2F11ABC32BFFBF0D000451A4 /* Resources */,
-				2F0DA96C2BE12EC900979111 /* Preview Content */,
 				2FB533EE2C25E9FD0003FDA7 /* Testing */,
 				2F306BF52BF08EFF000DD792 /* Archive */,
 			);
 			path = Renfo;
 			sourceTree = "<group>";
 		};
-		2F0DA96C2BE12EC900979111 /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				2F0DA96D2BE12EC900979111 /* Preview Assets.xcassets */,
-			);
-			path = "Preview Content";
-			sourceTree = "<group>";
-		};
-		2F0DA9742BE12F0300979111 /* Home */ = {
+		2F0DA9742BE12F0300979111 /* Festivals */ = {
 			isa = PBXGroup;
 			children = (
 				2F11ABBC2BFFBB95000451A4 /* Views */,
 				2F11ABBD2BFFBB9C000451A4 /* ViewModels */,
 			);
-			path = Home;
+			path = Festivals;
 			sourceTree = "<group>";
 		};
 		2F11ABA92BFFB945000451A4 /* Utilities */ = {
@@ -169,6 +180,7 @@
 			children = (
 				2FB3A7562C07C972005C9397 /* Extensions */,
 				2FB3A7572C07C97B005C9397 /* Helpers */,
+				2F481E522C35E79A009BE519 /* StateAbbreviations.swift */,
 				2F11ABB82BFFBACC000451A4 /* DateUtils.swift */,
 			);
 			path = Utilities;
@@ -218,6 +230,7 @@
 				2F306BF32BEEEE7D000DD792 /* AuthenticationView.swift */,
 				2FF991FA2BE9535E00587C68 /* AccountView.swift */,
 				2F306BFC2BF1CA11000DD792 /* AboutView.swift */,
+				2F7576642C330380004BE1CA /* WishKitView.swift */,
 				2FDA01472BE5598A005495A5 /* BeanBandits.swift */,
 			);
 			path = Views;
@@ -234,7 +247,6 @@
 			isa = PBXGroup;
 			children = (
 				2F0DA9642BE12EC800979111 /* RenfoApp.swift */,
-				2FB3A7602C092658005C9397 /* AppDelegate.swift */,
 				2F0DA9662BE12EC800979111 /* ContentView.swift */,
 			);
 			path = App;
@@ -244,6 +256,7 @@
 			isa = PBXGroup;
 			children = (
 				2F0DA96A2BE12EC900979111 /* Assets.xcassets */,
+				2F0DA96D2BE12EC900979111 /* Preview Assets.xcassets */,
 				2FF991EF2BE9397A00587C68 /* GoogleService-Info.plist */,
 			);
 			path = Resources;
@@ -252,6 +265,10 @@
 		2F306BF52BF08EFF000DD792 /* Archive */ = {
 			isa = PBXGroup;
 			children = (
+				2F81FB452C4B164B00C00264 /* MapSections.swift */,
+				2F75765D2C2FB43E004BE1CA /* MapViewBackup.swift */,
+				2FF991FC2BE9631A00587C68 /* TelegramHeader.swift */,
+				2FB533F12C2603990003FDA7 /* ScrollHeaderTest.swift */,
 				2F0DA97B2BE1305100979111 /* CalendarView.swift */,
 				2F1142432C19354200786406 /* URLImageView.swift */,
 				2F306BF82BF1C25E000DD792 /* FestivalViewBeforeAnimation.swift */,
@@ -271,7 +288,7 @@
 		2FB3A7552C07C7FC005C9397 /* Features */ = {
 			isa = PBXGroup;
 			children = (
-				2F0DA9742BE12F0300979111 /* Home */,
+				2F0DA9742BE12F0300979111 /* Festivals */,
 				2FD89E132C00F8FD00DCE49D /* Map */,
 				2F306BFA2BF1C930000DD792 /* Settings */,
 			);
@@ -289,6 +306,9 @@
 		2FB3A7572C07C97B005C9397 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				2F481E502C3598AE009BE519 /* ColoredButton.swift */,
+				2F7576572C2F3914004BE1CA /* MapSnapshot.swift */,
+				2F75765F2C2FBC95004BE1CA /* IsFestivalActive.swift */,
 				2F3FD1B52C2DDF15002899A1 /* ActiveIndicator.swift */,
 				2FB533EB2C24BACB0003FDA7 /* MeshgradientAnimation.swift */,
 				2F11ABAA2BFFB95D000451A4 /* URLButton.swift */,
@@ -305,9 +325,10 @@
 		2FB533EE2C25E9FD0003FDA7 /* Testing */ = {
 			isa = PBXGroup;
 			children = (
+				2F481E4E2C359748009BE519 /* AnimatedGradientView.swift */,
+				2F75765B2C2F610D004BE1CA /* Test3.swift */,
+				2F7576592C2F59AF004BE1CA /* Test2.swift */,
 				2F3FD1B12C2DCE73002899A1 /* Test.swift */,
-				2FF991FC2BE9631A00587C68 /* TelegramHeader.swift */,
-				2FB533F12C2603990003FDA7 /* ScrollHeaderTest.swift */,
 			);
 			path = Testing;
 			sourceTree = "<group>";
@@ -353,6 +374,7 @@
 				2F11AB942BFBF22B000451A4 /* FirebaseStorage */,
 				2F11AB962BFBF22B000451A4 /* FirebaseStorageCombine-Community */,
 				2F11AB992BFD0CEC000451A4 /* FirebaseFirestoreSwift */,
+				2F7576622C32FF77004BE1CA /* WishKit */,
 			);
 			productName = Renfo;
 			productReference = 2F0DA9612BE12EC800979111 /* Renfo.app */;
@@ -384,6 +406,7 @@
 			mainGroup = 2F0DA9582BE12EC800979111;
 			packageReferences = (
 				2FF991F12BE93B0900587C68 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				2F7576612C32FF77004BE1CA /* XCRemoteSwiftPackageReference "wishkit-ios" */,
 			);
 			productRefGroup = 2F0DA9622BE12EC800979111 /* Products */;
 			projectDirPath = "";
@@ -413,10 +436,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				2FD89E122BFFF15C00DCE49D /* FestivalViewModel.swift in Sources */,
+				2F7576602C2FBCB0004BE1CA /* IsFestivalActive.swift in Sources */,
 				2F11ABAD2BFFB968000451A4 /* ImageViewer.swift in Sources */,
 				2F11ABB32BFFB988000451A4 /* SafariView.swift in Sources */,
 				2F0DA9672BE12EC800979111 /* ContentView.swift in Sources */,
 				2FB642B72BFBBCD4002E8292 /* VendorListView.swift in Sources */,
+				2F7576652C330383004BE1CA /* WishKitView.swift in Sources */,
+				2F481E532C35E79F009BE519 /* StateAbbreviations.swift in Sources */,
+				2F75765E2C2FB442004BE1CA /* MapViewBackup.swift in Sources */,
 				2F306BFD2BF1CA11000DD792 /* AboutView.swift in Sources */,
 				2FB3A7652C099049005C9397 /* MapView.swift in Sources */,
 				2F11ABB92BFFBACC000451A4 /* DateUtils.swift in Sources */,
@@ -424,11 +451,13 @@
 				2F11AB9C2BFD1150000451A4 /* FestivalModel.swift in Sources */,
 				2F11ABB12BFFB97E000451A4 /* PulsingView.swift in Sources */,
 				2FF147832BF7BFB3001CD1A9 /* ParticleView.swift in Sources */,
+				2F75765C2C2F610F004BE1CA /* Test3.swift in Sources */,
 				2F11ABA82BFFB37E000451A4 /* FestivalListViewModel.swift in Sources */,
 				2FDA01482BE5598A005495A5 /* BeanBandits.swift in Sources */,
+				2F481E4F2C359753009BE519 /* AnimatedGradientView.swift in Sources */,
+				2F75765A2C2F59B3004BE1CA /* Test2.swift in Sources */,
 				2FB533F22C26039B0003FDA7 /* ScrollHeaderTest.swift in Sources */,
 				2F0DA9802BE1394700979111 /* FestivalListView.swift in Sources */,
-				2FB3A7612C092658005C9397 /* AppDelegate.swift in Sources */,
 				2F0DA97C2BE1305100979111 /* CalendarView.swift in Sources */,
 				2F306BF92BF1C25E000DD792 /* FestivalViewBeforeAnimation.swift in Sources */,
 				2F1142442C19354800786406 /* URLImageView.swift in Sources */,
@@ -443,8 +472,11 @@
 				2FF991FD2BE9631A00587C68 /* TelegramHeader.swift in Sources */,
 				2FF991FB2BE9535E00587C68 /* AccountView.swift in Sources */,
 				2F11ABB52BFFB991000451A4 /* DateExtensions.swift in Sources */,
+				2F7576582C2F3922004BE1CA /* MapSnapshot.swift in Sources */,
+				2F81FB462C4B165000C00264 /* MapSections.swift in Sources */,
 				2F11ABA62BFF9ED0000451A4 /* MailView.swift in Sources */,
 				2FB3A7672C0A3695005C9397 /* LocationManager.swift in Sources */,
+				2F481E512C3598B4009BE519 /* ColoredButton.swift in Sources */,
 				2F3FD1B22C2DCE75002899A1 /* Test.swift in Sources */,
 				2FB533EC2C24BAD40003FDA7 /* MeshgradientAnimation.swift in Sources */,
 				2F0DA9652BE12EC800979111 /* RenfoApp.swift in Sources */,
@@ -582,7 +614,7 @@
 				CODE_SIGN_ENTITLEMENTS = Renfo/Renfo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"Renfo/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Renfo/Resources\"";
 				DEVELOPMENT_TEAM = XKQ424HQ33;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -622,7 +654,7 @@
 				CODE_SIGN_ENTITLEMENTS = Renfo/Renfo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"Renfo/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Renfo/Resources\"";
 				DEVELOPMENT_TEAM = XKQ424HQ33;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -677,6 +709,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		2F7576612C32FF77004BE1CA /* XCRemoteSwiftPackageReference "wishkit-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/wishkit/wishkit-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.1.1;
+			};
+		};
 		2FF991F12BE93B0900587C68 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -702,6 +742,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2FF991F12BE93B0900587C68 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseFirestoreSwift;
+		};
+		2F7576622C32FF77004BE1CA /* WishKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2F7576612C32FF77004BE1CA /* XCRemoteSwiftPackageReference "wishkit-ios" */;
+			productName = WishKit;
 		};
 		2FF991F22BE93B0900587C68 /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;

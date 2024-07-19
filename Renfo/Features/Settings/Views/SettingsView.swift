@@ -71,9 +71,10 @@ struct SettingsView: View {
                     Label("About", systemImage: "info.circle")
                 }
                 
-                NavigationLink(destination: BeanBandits()) {
-                    Label("Bean Bandits", systemImage: "surfboard")
+                NavigationLink(destination: WishKitView()) {
+                    Label("Feature Requests", systemImage: "lightbulb.max")
                 }
+                
                 
                 NavigationLink(destination: ComingSoonView()) {
                     Label("Rate App", systemImage: "star")
@@ -93,6 +94,10 @@ struct SettingsView: View {
                     } icon: {
                         Image(systemName: "square.and.arrow.up")
                     }
+                }
+                
+                NavigationLink(destination: BeanBandits()) {
+                    Label("Bean Bandits", systemImage: "surfboard")
                 }
             }
         }
@@ -223,11 +228,16 @@ struct AppIconSelectionView: View, Hashable {
             Section(header: Text("App Icon")) {
                 ForEach(AppIcon.allCases, id: \.self) { icon in
                     HStack {
-                        Image(uiImage: UIImage(named: icon.rawValue) ?? UIImage())
+//                        Image(icon.rawValue)
+                        Image(icon.settingsImageName)
                             .resizable()
                             .scaledToFit()
                             .frame(width: 60, height: 60)
                             .clipShape(RoundedRectangle(cornerRadius: 15))
+                            .onAppear {
+//                                print("Attempting to load image: \(icon.rawValue)")
+                                print("Attempting to load image: \(icon.settingsImageName)")
+                            }
                         Text(icon.displayName)
                         Spacer()
                         if icon == selectedIcon {

@@ -76,10 +76,9 @@ class FestivalViewModel: ObservableObject {
         let formattedStartTime = festival.timeStart.toTime() ?? festival.timeStart
         let formattedEndTime = festival.timeEnd.toTime() ?? festival.timeEnd
 
+        let isActive = isFestivalActive(festival)
         let startDate = festival.dateStart.toDate(format: "MM/dd/yyyy") ?? Date.distantFuture
-        let endDate = festival.dateEnd.toDate(format: "MM/dd/yyyy") ?? Date.distantPast
         let currentDate = Date()
-        let isActive = (currentDate >= startDate && currentDate <= endDate)
         let daysUntilStart = Calendar.current.dateComponents([.day], from: currentDate, to: startDate).day
 
         let links: [(key: String, value: (systemImage: String, text: String, isActive: Bool, daysUntilStart: Int?))] = [

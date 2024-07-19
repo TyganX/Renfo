@@ -1,18 +1,20 @@
 import SwiftUI
+import MapKit
 
-@available(iOS 18.0, *)
 struct FestivalView: View {
     @ObservedObject var viewModel: FestivalViewModel
     
     @State private var logoImage: UIImage? = nil
     @State private var scrollOffset: CGFloat = 0
+    @State private var copiedToClipboard = false
     let impactFeedbackGenerator = UIImpactFeedbackGenerator(style: .light)
     
     var body: some View {
         VStack {
             List {
                 bodySection
-                footerSection
+                establishedBanner
+                missingInformation
             }
             .onScrollGeometryChange(for: CGFloat.self) { geometry in
                 return geometry.contentOffset.y
@@ -28,6 +30,19 @@ struct FestivalView: View {
             headerSection
         }
         .edgesIgnoringSafeArea(.top)
+        .overlay {
+            if copiedToClipboard {
+                Text("Copied to Clipboard")
+                    .font(.system(.body, design: .rounded, weight: .semibold))
+                    .padding()
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .padding(.bottom)
+                    .shadow(radius: 5)
+                    .transition(.move(edge: .bottom))
+                    .frame(maxHeight: .infinity, alignment: .bottom)
+            }
+        }
     }
     
     // MARK: - Header Section
@@ -37,8 +52,10 @@ struct FestivalView: View {
                 Image(uiImage: viewModel.logoImage ?? UIImage())
                     .resizable()
                     .scaledToFit()
-                    .frame(width: max(40, min(200, -180 - scrollOffset)))
-                    .frame(height: max(40, min(200, -180 - scrollOffset)))
+                    .frame(
+                        width: 200 + (40 - 200) * ((min(max(scrollOffset, -419), -220) + 419) / 199),
+                        height: 200 + (40 - 200) * ((min(max(scrollOffset, -419), -220) + 419) / 199)
+                    )
                     .clipShape(Circle())
                     .redacted(reason: viewModel.logoImage == nil ? .placeholder : [])
             }
@@ -48,20 +65,37 @@ struct FestivalView: View {
                 Text(viewModel.festival.name)
                     .foregroundColor(.white)
                     .fontDesign(.rounded)
-                    .font(scrollOffset >= -220 ? .body: .title3)
-                    .fontWeight(scrollOffset >= -220 ? .regular: .bold)
+                    .fontWeight(.bold)
+                    .font(.system(size: 20 + (15 - 20) * ((min(max(scrollOffset, -419), -220) + 419) / 199)))
+                    .minimumScaleFactor(0.5) // Allows text to scale down
+                    .lineLimit(1) // Ensures text stays on one line
             }
             .frame(height: 30)
             
             headerButtons
         }
+        .padding(.horizontal)
+        .padding(.bottom)
         .padding(.top, 95)
         .background(MeshgradientAnimation()
             .overlay(.ultraThinMaterial)
         )
+//        .background(Image(uiImage: viewModel.logoImage ?? UIImage())
+//            .resizable()
+//            .scaledToFit()
+//            .blur(radius: 50)
+//            .overlay(.ultraThinMaterial)
+//        )
+//        .background(RadialGradient(gradient: Gradient(colors: [.orange, .red]), center: .center, startRadius: 100, endRadius: 300)
+//        )
 //        .background(LinearGradient(colors: [.green.opacity(0.3), .blue.opacity(0.5)], startPoint: .top, endPoint: .bottom)
 //            .overlay(.ultraThinMaterial)
 //        )
+//        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .overlay(
+            Rectangle()
+                .stroke(.ultraThinMaterial, lineWidth: 1)
+        )
         .offset(y: min(0, max(-420 - scrollOffset, -200)))
     }
     
@@ -72,8 +106,6 @@ struct FestivalView: View {
                 createButton(config: config)
             }
         }
-        .padding(.horizontal)
-        .padding(.bottom)
     }
 
     private func createButton(config: ButtonConfig) -> some View {
@@ -86,6 +118,7 @@ struct FestivalView: View {
                 Text(config.label)
                     .font(.caption2)
                     .fontWeight(.semibold)
+                    .fontDesign(.rounded)
             }
             .frame(height: 40)
             .frame(maxWidth: .infinity)
@@ -179,6 +212,8 @@ struct FestivalView: View {
                 }
             }
             
+            addressSection
+            
             if !viewModel.resourceLinks.isEmpty {
                 Section(header: Text("Resources")) {
                     ForEach(viewModel.resourceLinks, id: \.key) { link in
@@ -195,12 +230,90 @@ struct FestivalView: View {
                     }
                 }
             }
+            mapSection
+        }
+        .fontDesign(.rounded)
+    }
+    
+    // MARK: - Address Section
+    private var addressSection: some View {
+        Section {
+            // Address
+            HStack {
+                Label {
+                    Text(viewModel.festival.address)
+                        .font(.body)
+                        .foregroundColor(.primary)
+                } icon: {
+                    Image(systemName: "")
+                        .foregroundColor(nil)
+                }
+                Spacer()
+            }
+            
+            // City, State, ZIP
+            HStack {
+                Label {
+                    Text("\(viewModel.festival.city), \(stateAbbreviations[viewModel.festival.state] ?? viewModel.festival.state) \(viewModel.festival.postalCode)")
+                        .font(.body)
+                        .foregroundColor(.primary)
+                } icon: {
+                    Image(systemName: "location")
+                        .foregroundColor(nil)
+                }
+                Spacer()
+            }
+            
+            // Country
+            HStack {
+                Label {
+                    Text("United States")
+                        .font(.body)
+                        .foregroundColor(.primary)
+                } icon: {
+                    Image(systemName: "")
+                        .foregroundColor(nil)
+                }
+                Spacer()
+            }
+        }
+        .onTapGesture {
+            impactFeedbackGenerator.impactOccurred()
+            
+            // Construct the full address
+            let fullAddress = """
+            \(viewModel.festival.address)
+            \(viewModel.festival.city), \(stateAbbreviations[viewModel.festival.state] ?? viewModel.festival.state) \(viewModel.festival.postalCode)
+            United States
+            """
+            
+            UIPasteboard.general.string = fullAddress
+            
+            withAnimation(.snappy) {
+                copiedToClipboard = true
+            }
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                withAnimation(.snappy) {
+                    copiedToClipboard = false
+                }
+            }
         }
     }
     
-    // MARK: - Footer Section
-    private var footerSection: some View {
-        establishedBanner
+    // MARK: - Map Section
+    private var mapSection: some View {
+        Section {
+            if let geoPoint = viewModel.festival.coordinates {
+                MapSnapshot(coordinate: CLLocationCoordinate2D(latitude: geoPoint.latitude, longitude: geoPoint.longitude))
+                    .frame(height: 150)
+                    .listRowInsets(EdgeInsets())
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .stroke(.ultraThinMaterial, lineWidth: 1)
+                    )
+            }
+        }
     }
     
     // MARK: - Established Banner
@@ -219,8 +332,20 @@ struct FestivalView: View {
                 .foregroundStyle(.secondary)
                 .fontWeight(.bold)
                 .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
             }
         }
+    }
+    
+    // MARK: - Missing Information
+    private var missingInformation: some View {
+        HStack {
+            Text("Missing information?")
+            Text("Let us know!")
+                .foregroundColor(.blue)
+        }
+        .frame(maxWidth: .infinity)
+        .listRowBackground(Color.clear)
     }
 }
 
@@ -233,11 +358,8 @@ struct ButtonConfig {
 }
 
 // MARK: - Preview Provider
-@available(iOS 18.0, *)
-struct FestivalView_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationStack {
-            FestivalView(viewModel: FestivalViewModel(festival: .sample))
-        }
+#Preview {
+    NavigationStack {
+        FestivalView(viewModel: FestivalViewModel(festival: .sample))
     }
 }

@@ -58,6 +58,7 @@ struct SocialButton: View {
                 } icon: {
                     image
                 }
+//                .symbolRenderingMode(.multicolor)
                 Spacer()
                 Image(systemName: "chevron.up")
                     .foregroundStyle(.placeholder)

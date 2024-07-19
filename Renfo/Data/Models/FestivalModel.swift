@@ -101,6 +101,7 @@ extension FestivalModel {
         festival.website = "https://www.texrenfest.com"
         festival.xHandle = "texrenfest"
         festival.youTubeChannel = "@texasrenaissancefestival3257"
+        festival.coordinates = GeoPoint(latitude: 30.25902, longitude: -95.83062)
         return festival
     }
 }

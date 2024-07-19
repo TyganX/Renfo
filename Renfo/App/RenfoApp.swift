@@ -12,19 +12,20 @@ import FirebaseStorage
 import Combine
 
 // MARK: - Main Application Entry Point
-@available(iOS 18.0, *)
 @main
 struct RenfoApp: App {
-    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    
     // MARK: - App Storage Properties
     @AppStorage("appTheme") private var appTheme: AppTheme = .system
     @AppStorage("selectedIcon") private var selectedIcon: AppIcon = .default
     @AppStorage("appColor") private var appColor: AppColor = .default
     
     // MARK: - State Object
-    // SessionStore to manage user session state
     @StateObject private var sessionStore = SessionStore()
+    
+    init() {
+        configureFirebase()
+        configureFirestore()
+    }
     
     // MARK: - Scene Builder
     var body: some Scene {
@@ -36,7 +37,6 @@ struct RenfoApp: App {
     }
 
     // MARK: - Helper Methods
-    // Determine the color scheme based on the app theme setting
     private func determineColorScheme() -> ColorScheme? {
         switch appTheme {
         case .light:
@@ -47,23 +47,29 @@ struct RenfoApp: App {
             return nil
         }
     }
+
+    private func configureFirebase() {
+        FirebaseApp.configure()
+    }
+    
+    private func configureFirestore() {
+        let settings = Firestore.firestore().settings
+        settings.cacheSettings = PersistentCacheSettings()
+        Firestore.firestore().settings = settings
+    }
 }
 
 // MARK: - Enumerations
-// Define the AppTheme enum for theme settings
 enum AppTheme: String, CaseIterable, Identifiable {
     case system, light, dark
     
     var id: String { self.rawValue }
 }
 
-// Define the AppIcon enum for app icon customization
 enum AppIcon: String, CaseIterable {
     case `default` = "AppIcon"
     case chalice = "AppIcon-Chalice"
     case gold = "AppIcon-Gold"
-    case pink = "AppIcon-Pink"
-    // Add more cases for each alternate icon
 
     var displayName: String {
         switch self {
@@ -73,18 +79,19 @@ enum AppIcon: String, CaseIterable {
             return "Chalice"
         case .gold:
             return "Gold"
-        case .pink:
-            return "Pink"
-        // Add more display names for each case
         }
     }
 
     var iconName: String? {
         self == .default ? nil : self.rawValue
     }
+    
+    
+    var settingsImageName: String {
+        return rawValue.replacingOccurrences(of: "App", with: "")
+    }
 }
 
-// Define the AppColor enum for accent color customization
 enum AppColor: String, CaseIterable, Identifiable, Hashable {
     case `default` = "Default"
     case royalOrange = "Royal Orange"
@@ -202,54 +209,17 @@ class SessionStore: ObservableObject {
         var publishers = [AnyPublisher<Bool, Error>]()
         
         if let name = name {
-            let namePublisher = Future<Bool, Error> { promise in
-                let changeRequest = user.createProfileChangeRequest()
-                changeRequest.displayName = name
-                changeRequest.commitChanges { error in
-                    if let error = error {
-                        promise(.failure(error))
-                    } else {
-                        self.userName = name
-                        promise(.success(true))
-                    }
-                }
-            }.eraseToAnyPublisher()
+            let namePublisher = updateUserName(name)
             publishers.append(namePublisher)
         }
         
         if let email = email, email != user.email {
-            let emailPublisher = Future<Bool, Error> { promise in
-                user.sendEmailVerification(beforeUpdatingEmail: email) { error in
-                    if let error = error {
-                        promise(.failure(error))
-                    } else {
-                        promise(.success(true))
-                    }
-                }
-            }.eraseToAnyPublisher()
+            let emailPublisher = updateUserEmail(email)
             publishers.append(emailPublisher)
         }
         
         if let profilePicture = profilePicture {
-            let profilePicturePublisher = Future<Bool, Error> { promise in
-                self.uploadProfilePicture(image: profilePicture) { result in
-                    switch result {
-                    case .success(let url):
-                        let changeRequest = user.createProfileChangeRequest()
-                        changeRequest.photoURL = url
-                        changeRequest.commitChanges { error in
-                            if let error = error {
-                                promise(.failure(error))
-                            } else {
-                                self.userPhotoURL = url.absoluteString
-                                promise(.success(true))
-                            }
-                        }
-                    case .failure(let error):
-                        promise(.failure(error))
-                    }
-                }
-            }.eraseToAnyPublisher()
+            let profilePicturePublisher = updateUserProfilePicture(profilePicture)
             publishers.append(profilePicturePublisher)
         }
         
@@ -257,6 +227,58 @@ class SessionStore: ObservableObject {
             .collect()
             .map { _ in true }
             .eraseToAnyPublisher()
+    }
+    
+    private func updateUserName(_ name: String) -> AnyPublisher<Bool, Error> {
+        Future { promise in
+            let changeRequest = Auth.auth().currentUser?.createProfileChangeRequest()
+            changeRequest?.displayName = name
+            changeRequest?.commitChanges { error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    self.userName = name
+                    promise(.success(true))
+                }
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+    
+    private func updateUserEmail(_ email: String) -> AnyPublisher<Bool, Error> {
+        Future { promise in
+            Auth.auth().currentUser?.sendEmailVerification(beforeUpdatingEmail: email) { error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(true))
+                }
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+    
+    private func updateUserProfilePicture(_ profilePicture: UIImage) -> AnyPublisher<Bool, Error> {
+        Future { promise in
+            self.uploadProfilePicture(image: profilePicture) { result in
+                switch result {
+                case .success(let url):
+                    let changeRequest = Auth.auth().currentUser?.createProfileChangeRequest()
+                    changeRequest?.photoURL = url
+                    changeRequest?.commitChanges { error in
+                        if let error = error {
+                            promise(.failure(error))
+                        } else {
+                            self.userPhotoURL = url.absoluteString
+                            promise(.success(true))
+                        }
+                    }
+                case .failure(let error):
+                    promise(.failure(error))
+                }
+            }
+        }
+        .eraseToAnyPublisher()
     }
     
     private func uploadProfilePicture(image: UIImage, completion: @escaping (Result<URL, Error>) -> Void) {
@@ -282,8 +304,11 @@ class SessionStore: ObservableObject {
     }
 }
 
+// MARK: - Auth Extensions
 extension Auth {
-    func createUserPublisher(withEmail email: String, password: String) -> AnyPublisher<AuthDataResult, Error> {
+    typealias AuthResultPublisher = AnyPublisher<AuthDataResult, Error>
+    
+    func createUserPublisher(withEmail email: String, password: String) -> AuthResultPublisher {
         Future { promise in
             self.createUser(withEmail: email, password: password) { authResult, error in
                 if let error = error {
@@ -296,7 +321,7 @@ extension Auth {
         .eraseToAnyPublisher()
     }
     
-    func signInPublisher(withEmail email: String, password: String) -> AnyPublisher<AuthDataResult, Error> {
+    func signInPublisher(withEmail email: String, password: String) -> AuthResultPublisher {
         Future { promise in
             self.signIn(withEmail: email, password: password) { authResult, error in
                 if let error = error {

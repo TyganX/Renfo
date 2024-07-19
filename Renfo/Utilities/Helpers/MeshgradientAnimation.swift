@@ -1,6 +1,5 @@
 import SwiftUI
 
-@available(iOS 18.0, *)
 struct MeshgradientAnimation: View {
     @State private var isAnimating = false
     
@@ -42,7 +41,6 @@ struct MeshgradientAnimation: View {
     }
 }
 
-@available(iOS 18.0, *)
 struct MeshgradientAnimation_Previews: PreviewProvider {
     static var previews: some View {
         MeshgradientAnimation()

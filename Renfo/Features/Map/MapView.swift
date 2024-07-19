@@ -2,14 +2,21 @@ import SwiftUI
 import MapKit
 
 // MARK: - Map View
-@available(iOS 18.0, *)
 struct MapView: View {
-    @StateObject private var firestoreService = FirestoreService() // Manages data fetching from Firestore
-    @StateObject private var locationManager = LocationManager() // Manages user location updates
-    @State private var position = MapCameraPosition.automatic // Using automatic position to let the map decide the best view
-    @State private var isHybridStyle = false // State to toggle between map styles (standard and hybrid)
-    @State private var selectedFestival: FestivalModel? // State for selected marker
-    @State private var isSheetPresented: Bool = false // State to present sheet
+    @StateObject private var firestoreService = FirestoreService()
+    @StateObject private var locationManager = LocationManager()
+    @State private var position = MapCameraPosition.automatic
+    @State private var isHybridStyle = false
+    @State private var selectedFestival: FestivalModel?
+    @State private var logoImage: UIImage? = nil
+    @State private var isSheetPresented: Bool = false
+    @State private var showFestivalPreview = false
+    @State private var showSearchBar = true
+    @State private var showSearchList: Bool = false
+    @State private var searchText = ""
+    @State private var isEditing = false
+    @FocusState private var isFocused: Bool
+    @EnvironmentObject var festivalListViewModel: FestivalListViewModel
 
     // MARK: - View Body
     var body: some View {
@@ -18,19 +25,47 @@ struct MapView: View {
             Color.clear
                 .frame(height: 0)
                 .background(.ultraThinMaterial)
-//                .blur(radius: 15)
         }
         .sheet(isPresented: $isSheetPresented) {
             if let festival = selectedFestival {
-                SheetView(festival: festival) // Pass the selected festival to the sheet
+                NavigationStack {
+                    FestivalView(viewModel: FestivalViewModel(festival: festival)) // Pass the selected festival to the sheet
+                }
+                .presentationDragIndicator(.visible)
+                .presentationDetents([.fraction(0.99)])
             }
         }
-        .onChange(of: selectedFestival) {
-            isSheetPresented = selectedFestival != nil // Present the sheet when a marker is selected
+        .onChange(of: selectedFestival) { oldFestival, newFestival in
+            withAnimation {
+                showSearchBar = newFestival == nil
+                showFestivalPreview = newFestival != nil // Present the sheet when a marker is selected
+            }
+            if let festival = newFestival {
+                loadImage(for: festival)
+            }
+            
+            if newFestival == nil {
+                withAnimation {
+                    position = MapCameraPosition.automatic
+                }
+            }
         }
         .overlay(alignment: .topTrailing) {
             buttons
         }
+        .overlay(
+            Group {
+                if let festival = selectedFestival, showFestivalPreview {
+                    festivalPreview(festival: festival, showFestivalPreview: $showFestivalPreview)
+                        .transition(.move(edge: .bottom))
+                        .animation(.spring(), value: showFestivalPreview)
+                }
+                
+                if showSearchBar {
+                    searchSheet
+                }
+            }
+        )
     }
     
     // MARK: - Map Components
@@ -38,23 +73,24 @@ struct MapView: View {
         Map(position: $position, selection: $selectedFestival) {
             ForEach(firestoreService.festivals) { festival in
                 if let coordinates = festival.coordinates {
-                    Marker(festival.name, coordinate: CLLocationCoordinate2D(latitude: coordinates.latitude, longitude: coordinates.longitude))
+                    Marker(festival.name, systemImage: "crown.fill", coordinate: CLLocationCoordinate2D(latitude: coordinates.latitude, longitude: coordinates.longitude))
                         .tag(festival)
+                        .tint(isFestivalActive(festival) ? .green : .red)
                 }
             }
             UserAnnotation()
-            .mapItemDetailSelectionAccessory(.callout)
+                .mapItemDetailSelectionAccessory(.callout)
         }
-        .mapFeatureSelectionAccessory(.callout)
         .safeAreaInset(edge: .top) {
             Color.clear
                 .frame(height: 160)
         }
-        .mapStyle(isHybridStyle ? .hybrid(elevation: .realistic) : .standard) // Toggle between hybrid and standard map styles
-        .ignoresSafeArea(edges: .all) // Extend the map to the edges of the screen
+        .mapFeatureSelectionAccessory(.callout)
+        .mapStyle(isHybridStyle ? .hybrid(elevation: .realistic) : .standard)
+        .ignoresSafeArea(edges: .all)
         .onAppear {
             firestoreService.fetchAllFestivals { festivals in
-                firestoreService.festivals = festivals // Fetch festivals and update the list
+                firestoreService.festivals = festivals
             }
         }
         .mapControls {
@@ -67,16 +103,16 @@ struct MapView: View {
     private var buttons: some View {
         VStack(spacing: 0) {
             Button(action: {
-                isHybridStyle.toggle() // Toggle map style
+                isHybridStyle.toggle()
             }) {
                 Image(systemName: isHybridStyle ? "globe.americas.fill" : "map.fill")
                     .frame(width: 44, height: 44)
             }
-            
+
             Divider()
-            
+
             Button(action: {
-                centerOnUserLocation() // Center on user's location
+                centerOnUserLocation()
             }) {
                 Image(systemName: "location.fill")
                     .frame(width: 44, height: 44)
@@ -84,10 +120,156 @@ struct MapView: View {
         }
         .frame(width: 44)
         .foregroundColor(.blue)
-        .background(.ultraThinMaterial) // Background with ultra thin material effect
-        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous)) // Rounded rectangle with continuous style for smooth corners
-        .padding(.top, 15) // Padding to position the button group
-        .padding(.trailing, 5) // Padding to position the button group
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .padding(.top, 15)
+        .padding(.trailing, 5)
+    }
+    
+    // MARK: - Search Sheet
+    private var searchSheet: some View {
+        VStack {
+            Spacer()
+            VStack {
+                searchBar
+                
+                if showSearchList {
+                    searchList
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .shadow(color: Color.black.opacity(0.2), radius: 20)
+            .overlay(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .stroke(.ultraThinMaterial, lineWidth: 1)
+            )
+            .padding()
+        }
+    }
+    
+    private var searchBar: some View {
+        HStack {
+            Image(systemName: "magnifyingglass")
+                .foregroundColor(.secondary)
+            TextField("Search", text: $searchText, onEditingChanged: { (editingChanged) in
+                if editingChanged {
+//                    print("TextField focused")
+//                    withAnimation {
+                        showSearchList = true
+//                    }
+                } else {
+//                    print("TextField focus removed")
+                }
+            })
+            .focused($isFocused)
+            .foregroundColor(.primary)
+            .autocorrectionDisabled()
+            
+            if searchText != "" {
+                Button(action: {
+                    searchText = ""
+                }) {
+                    Image(systemName: "multiply.circle.fill")
+                        .foregroundColor(.gray)
+                        .padding(.trailing, 8)
+                }
+            }
+            
+            if showSearchList {
+                Button(action: {
+                    withAnimation {
+                        isFocused = false
+                        showSearchList = false
+                        searchText = ""
+                    }
+                }) {
+                    Text("Cancel")
+                }
+            }
+        }
+        .padding(10)
+//        .overlay(
+//            RoundedRectangle(cornerRadius: 10, style: .continuous)
+//                .stroke(.ultraThinMaterial, lineWidth: 2)
+//        )
+    }
+    
+    private var searchList: some View {
+        List {
+            ForEach(firestoreService.festivals.filter { $0.name.contains(searchText) || searchText.isEmpty }.sorted(by: { $0.name < $1.name })) { festival in
+                FestivalRow(festival: festival)
+                    .onTapGesture {
+                        withAnimation {
+                            isFocused = false
+                            showSearchList = false
+                        }
+                        selectFestival(festival)
+                    }
+            }
+            .listRowBackground(Color.clear)
+        }
+        .listStyle(PlainListStyle())
+    }
+    
+    // MARK: - Festival Preview Sheet
+    private func festivalPreview(festival: FestivalModel, showFestivalPreview: Binding<Bool>) -> some View {
+        VStack {
+            Spacer()
+            VStack {
+                Image(uiImage: logoImage ?? UIImage())
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 150)
+                    .frame(height: 150)
+                    .clipShape(Circle())
+                    .redacted(reason: logoImage == nil ? .placeholder : [])
+                
+                Text(festival.name)
+                    .foregroundColor(.white)
+                    .fontDesign(.rounded)
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .padding(.horizontal)
+                    .minimumScaleFactor(0.5)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 200)
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .shadow(color: Color.black.opacity(0.2), radius: 20)
+            .overlay(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .stroke(.ultraThinMaterial, lineWidth: 1)
+            )
+            .overlay(alignment: .topTrailing) {
+                // Close Button
+                ColoredButton(systemImage: "xmark", tint: .secondary) {
+                    withAnimation {
+                        selectedFestival = nil
+                    }
+                }
+                .padding(10)
+            }
+            .overlay(alignment: .topLeading) {
+                // Learn More Button
+                ColoredButton(systemImage: "info", tint: .blue) {
+                    withAnimation {
+                        isSheetPresented = true
+                    }
+                }
+                .padding(10)
+            }
+        }
+        .padding()
+    }
+
+    // MARK: - Load Festival Image
+    private func loadImage(for festival: FestivalModel) {
+        firestoreService.downloadImage(imageName: festival.logoImage) { image in
+            logoImage = image
+        }
     }
     
     // MARK: - Center on User Location
@@ -101,29 +283,25 @@ struct MapView: View {
             }
         }
     }
-}
-
-// MARK: - Sheet View
-@available(iOS 18.0, *)
-struct SheetView: View {
-    var festival: FestivalModel // Take the festival as an input
     
-    var body: some View {
-        NavigationStack {
-            FestivalView(viewModel: FestivalViewModel(festival: festival))
+    // MARK: - Center on Selected Festival
+    private func selectFestival(_ festival: FestivalModel) {
+        selectedFestival = festival
+        if let coordinates = festival.coordinates {
+            withAnimation {
+                position = .region(MKCoordinateRegion(
+                    center: CLLocationCoordinate2D(latitude: coordinates.latitude, longitude: coordinates.longitude),
+                    span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+                ))
+            }
         }
-//        .presentationDetents([.height(295), .large])
-        .presentationDetents([.height(375), .fraction(0.99)])
-        .presentationBackground(.regularMaterial)
-        .presentationBackgroundInteraction(.enabled(upThrough: .fraction(0.99)))
-//        .presentationBackgroundInteraction(.enabled(upThrough: .large))
     }
 }
 
 // MARK: - Preview Provider
-@available(iOS 18.0, *)
-struct MapView_Previews: PreviewProvider {
-    static var previews: some View {
+#Preview {
+    NavigationStack {
         MapView()
+            .environmentObject(FestivalListViewModel())
     }
 }

@@ -1,14 +1,14 @@
 import SwiftUI
 
-@available(iOS 18.0, *)
 struct ContentView: View {
     @AppStorage("appColor") var appColor: AppColor = .default
     @StateObject private var listViewModel = FestivalListViewModel()
 
     var body: some View {
+        // MARK: - iOS 18 Tab View
         TabView {
-            // Home Tab
-            Tab("Festivals", systemImage: "building.columns") {
+            // Festivals Tab
+            Tab("Festivals", systemImage: "crown") {
                 NavigationStack {
                     FestivalListView()
                         .environmentObject(listViewModel)
@@ -19,6 +19,7 @@ struct ContentView: View {
             Tab("Map", systemImage: "map") {
                 NavigationStack {
                     MapView()
+                        .environmentObject(listViewModel)
                 }
             }
             
@@ -29,47 +30,15 @@ struct ContentView: View {
                 }
             }
         }
-        .accentColor(appColor.color)
-        .tabViewStyle(.sidebarAdaptable)
         
-//        TabView() {
-//            // Home Tab
-//            NavigationStack {
-//                FestivalListView()
-//                    .environmentObject(listViewModel)
-//            }
-//            .tabItem {
-//                Image(systemName: "building.columns")
-//                Text("Festivals")
-//            }
-//            
-//            // Map Tab
-//            NavigationStack {
-//                MapView()
-//            }
-//            .tabItem {
-//                Image(systemName: "map")
-//                Text("Map")
-//            }
-//
-//            // Settings Tab
-//            NavigationStack {
-//                SettingsView()
-//            }
-//            .tabItem {
-//                Image(systemName: "gearshape.fill")
-//                Text("Settings")
-//            }
-//        }
-//        .accentColor(appColor.color)
+        .accentColor(appColor.color)
+//        .environment(\.font, Font.system(design: .rounded))
+        .tabViewStyle(.sidebarAdaptable)
     }
 }
 
 // MARK: - Preview Provider
-@available(iOS 18.0, *)
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-            .environmentObject(SessionStore())
-    }
+#Preview {
+    ContentView()
+        .environmentObject(SessionStore())
 }
