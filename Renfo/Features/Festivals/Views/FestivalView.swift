@@ -2,11 +2,13 @@ import SwiftUI
 import MapKit
 
 struct FestivalView: View {
+    @EnvironmentObject var sessionStore: SessionStore
     @ObservedObject var viewModel: FestivalViewModel
     
     @State private var logoImage: UIImage? = nil
     @State private var scrollOffset: CGFloat = 0
     @State private var copiedToClipboard = false
+    @State private var isEditing = false
     let impactFeedbackGenerator = UIImpactFeedbackGenerator(style: .light)
     
     var body: some View {
@@ -26,6 +28,7 @@ struct FestivalView: View {
         .scrollIndicators(.hidden)
         .toolbarBackground(.hidden, for: .navigationBar)
         .navigationBarItems(trailing: favoriteButton)
+        .navigationBarItems(trailing: editButton)
         .safeAreaInset(edge: .top) {
             headerSection
         }
@@ -187,6 +190,20 @@ struct FestivalView: View {
                 .foregroundColor(viewModel.isFavorite ? .yellow : .gray)
         }
     }
+    
+    // MARK: - Edit Button
+    private var editButton: some View {
+        Button(action: {
+            isEditing.toggle()
+        }) {
+            Image(systemName: isEditing ? "checkmark" : "pencil")
+//                .foregroundColor(viewModel.isFavorite ? .yellow : .gray)
+        }
+    }
+    
+//    private var isCurrentUserMe: Bool {
+//        return sessionStore.userEmail == "Tyler@Keegan.pro"
+//    }
     
     // MARK: - Body Section
     private var bodySection: some View {
